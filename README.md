@@ -30,3 +30,7 @@ This repository will initially serve as a staging point for the source and data 
 2. [Submission Prep Script Wiki](https://github.com/nih-cfde/published-documentation/wiki/submission-prep-script)
 3. [Link to C2M2 Submission Prep Script](https://osf.io/c67sp)
 4. [Link to CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
+
+### Challenges
+
+1. Going to hit the pause button on source tracking the CV Reference Files at the moment. They are very large and are causing issues in the repository when loaded. At the moment, this will have to be a manual download to the environment where the c2m2 submission preparation script is being executed.
