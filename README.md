@@ -20,10 +20,13 @@ Add additional badges for CI, docs, and other integrations as needed within the
 
 ### Repo Description
 
-Update the repositories description with a short summary of the repository's
-intent.
-Include an appropriate emoji at the start of the summary.
+This repository will initially serve as a staging point for the source and data files associated with the C2M2 submission process. It might eventually grow into a pipeline for the C2M2 process, but we are starting small.
 
-Add a handful of tags that summarize topics relating to the repository.
-If the repo has a documentation site or webpage, add it next to the repository
-description.
+"A journey of a thousand miles begins with a single step" -Laozi
+
+### Important Links
+
+1. [Base Wiki Page for C2M2 Submissions](https://github.com/nih-cfde/published-documentation/wiki/Quickstart)
+2. [Submission Prep Script Wiki](https://github.com/nih-cfde/published-documentation/wiki/submission-prep-script)
+3. [Link to C2M2 Submission Prep Script](https://osf.io/c67sp)
+4. [Link to CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
