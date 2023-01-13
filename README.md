@@ -30,6 +30,38 @@ This repository will initially serve as a staging point for the source and data 
 2. [Submission Prep Script Wiki](https://github.com/nih-cfde/published-documentation/wiki/submission-prep-script)
 3. [Link to C2M2 Submission Prep Script](https://osf.io/c67sp)
 4. [Link to CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
+4. [Link for JSON Schema document describing the current C2M2 metadata model](https://osf.io/c63aw/)
+
+### Submission Process Steps
+
+1. Set up directory and stage files
+
+```python
+python3 -m venv virtualenvY3Q1
+
+source virtualenvY3Q1/bin/activate 
+
+pip install --upgrade pip 
+
+cd c2m2_helper_year3_q1 
+
+python prepare_C2M2_submission.py 
+```
+2. Run Frictionless Validator
+
+***Note*** Frictionless: Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data (DEVT Framework). 
+
+```python
+pip install frictionless 
+
+cd frictionless_validate_combined_output 
+
+frictionless validate C2M2_datapackage.json > ~frictionlessreport_c2m2_submission_year3_q1_v1.txt 
+```
+
+3. Install C2M2 submission code and re-run submission
+
+Steps tbd.
 
 ### Challenges
 
