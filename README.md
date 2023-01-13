@@ -36,7 +36,7 @@ This repository will initially serve as a staging point for the source and data 
 
 1. Set up directory and stage files
 
-```python
+```bash
 python3 -m venv virtualenvY3Q1
 
 source virtualenvY3Q1/bin/activate 
@@ -51,7 +51,7 @@ python prepare_C2M2_submission.py
 
 ***Note*** Frictionless: Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data (DEVT Framework). 
 
-```python
+```bash
 pip install frictionless 
 
 cd frictionless_validate_combined_output 
