@@ -31,6 +31,8 @@ This repository will initially serve as a staging point for the source and data 
 3. [Link to C2M2 Submission Prep Script](https://osf.io/c67sp)
 4. [Link to CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
 4. [Link for JSON Schema document describing the current C2M2 metadata model](https://osf.io/c63aw/)
+5. [Frictionless: Data management framework for Python](https://pypi.org/project/frictionless/)
+6. [OSF Client: Cli tool for grabbing OSF artifacts](https://osfclient.readthedocs.io/en/latest/)
 
 ### Submission Process Steps
 
@@ -63,6 +65,4 @@ frictionless validate C2M2_datapackage.json > ~frictionlessreport_c2m2_submissio
 
 Steps tbd.
 
-### Challenges
 
-1. Going to hit the pause button on source tracking the CV Reference Files at the moment. They are very large and are causing issues in the repository when loaded. At the moment, this will have to be a manual download to the environment where the c2m2 submission preparation script is being executed.
