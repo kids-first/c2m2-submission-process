@@ -70,7 +70,7 @@ source setup_evn.sh
  - Generates the validation report 
 
  ```bash
-./validate_submission.sh
+./validate_submission.sh YEAR QUARTER VERSION
  ```
 
 5. Submit data
