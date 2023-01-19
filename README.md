@@ -28,9 +28,10 @@ This repository will initially serve as a staging point for the source and data 
 
 1. [Base Wiki Page for C2M2 Submissions](https://github.com/nih-cfde/published-documentation/wiki/Quickstart)
 2. [Submission Prep Script Wiki](https://github.com/nih-cfde/published-documentation/wiki/submission-prep-script)
-3. [Link to C2M2 Submission Prep Script](https://osf.io/c67sp)
-4. [Link to CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
-4. [Link for JSON Schema document describing the current C2M2 metadata model](https://osf.io/c63aw/)
+3. [C2M2 Submission Prep Script](https://osf.io/c67sp)
+4. [C2M2 Table Summary](https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary)
+4. [CV Reference Files](https://osf.io/bq6k9/files/osfstorage)
+4. [JSON Schema document describing the current C2M2 metadata model](https://osf.io/c63aw/)
 5. [Frictionless: Data management framework for Python](https://pypi.org/project/frictionless/)
 6. [OSF Client: Cli tool for grabbing OSF artifacts](https://osfclient.readthedocs.io/en/latest/)
 
