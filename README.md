@@ -34,6 +34,7 @@ This repository will initially serve as a staging point for the source and data 
 4. [JSON Schema document describing the current C2M2 metadata model](https://osf.io/c63aw/)
 5. [Frictionless: Data management framework for Python](https://pypi.org/project/frictionless/)
 6. [OSF Client: Cli tool for grabbing OSF artifacts](https://osfclient.readthedocs.io/en/latest/)
+7. [CFDE Submission Doc](https://docs.nih-cfde.org/en/latest/cfde-submit/docs/)
 
 ### Submission Process Steps
 
