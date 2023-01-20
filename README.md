@@ -74,5 +74,24 @@ source setup_evn.sh
 ./validate_submission.sh YEAR QUARTER VERSION
  ```
 
-5. Submit data
- - tbd
+5. Submit data to CFDE portal
+ - Login with submit tool 
+ - Execute submission
+   * Check tables for conformance to C2M2's latest release notes
+   * Set DCC for submission (cfde_registry_dcc:kidsfirst)
+ - Verify submission in progress
+ - Review submission results
+
+ ```bash
+# Will be redirected to web browser for credentials
+cfde-submit login 
+
+# Command starts submission and sets data coordinating center
+cfde-submit run path-to-frictionless-validation --ignore-git --dcc-id cfde_registry_dcc:kidsfirst 
+
+# Can be executed intermittently to verify submission status
+cfde-submit status
+
+# Logout when submission is completed
+cfde-submit logout
+```
