@@ -5,19 +5,6 @@
   <a href="https://github.com/kids-first/kf-template-repo/blob/master/LICENSE"><img src="https://img.shields.io/github/license/kids-first/kf-template-repo.svg?style=for-the-badge"></a>
 </p>
 
-# Kids First Repository Template
-
-Use this template to bootstrap a new Kids First repository.
-
-### Badges
-
-Update the LICENSE badge to point to the new repo location on GitHub.
-Note that the LICENSE badge will fail to render correctly unless the repo has
-been set to **public**.
-
-Add additional badges for CI, docs, and other integrations as needed within the
-`<p>` tag next to the LICENSE.
-
 ### Repo Description
 
 This repository will initially serve as a staging point for the source and data files associated with the C2M2 submission process. It might eventually grow into a pipeline for the C2M2 process, but we are starting small.
@@ -75,6 +62,8 @@ source setup_evn.sh
  ```
 
 5. Submit data to CFDE portal
+
+*** Refer to Important Links #7 for additional info***
  - Login with submit tool 
  - Execute submission
    * Check tables for conformance to C2M2's latest release notes
