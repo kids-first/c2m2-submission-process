@@ -3,7 +3,7 @@ import os
 from os import DirEntry
 
 def get_table_from_user() -> str:
-    user_input = input("What table would you like to see?")
+    user_input = input("What table would you like to see? ")
     return user_input
 
 def is_tsv(file : DirEntry):
@@ -19,5 +19,8 @@ with os.scandir("./frictionless_validation") as directory:
 
 
 while user_input := get_table_from_user():
-    subject_df = data_frame_dict[user_input + '.tsv']
-    print(subject_df.head())
+    user_selected_df = data_frame_dict[user_input + '.tsv']
+    print(user_selected_df.head())
+    
+     
+    
