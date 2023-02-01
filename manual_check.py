@@ -8,14 +8,31 @@ def main():
     data_frame_dict = {}
     with os.scandir(args.path) as directory:
         tsv_s = filter(is_tsv,directory)
-        for tsv in tsv_s:
+        tsv_list = list(tsv_s)
+        tsv_list.sort(key = lambda item : item.name)
+        for tsv in tsv_list:
             print(tsv)
             data_frame_dict.update({tsv.name : pd.read_table(tsv)})
 
-
     while user_input := get_table_from_user():
-        user_selected_df = data_frame_dict[user_input + '.tsv']
-        print(user_selected_df.head())
+        tsv = user_input + '.tsv'
+        if tsv in data_frame_dict.keys():
+            user_selected_df = data_frame_dict[tsv]
+            print(user_selected_df.head())
+        else:
+            print("Not a valid table!!!")
+
+    print('*' * 80)
+    print('UNEMPTY TABLES') 
+    for tablename, df in data_frame_dict.items():
+        if not df.empty:
+            print(tablename)
+
+    print('*' * 80)
+    print('EMPTY TABLES') 
+    for tablename, df in data_frame_dict.items():
+        if df.empty:
+            print(tablename)
 
 
 def get_table_from_user() -> str:
