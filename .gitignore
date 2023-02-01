@@ -6,6 +6,7 @@
 /data_validation
 /submission_tools
 /frictionless_validation
+/.vscode
 frictionlessreport*.txt
 pyvenv.cfg
 C2M2_datapackage.json
