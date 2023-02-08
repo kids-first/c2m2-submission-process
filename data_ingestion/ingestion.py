@@ -1,28 +1,53 @@
 import requests
-import pandas as pd
 import time
 import warnings
+import os
+import pandas as pd
+from transform import is_tsv
 
+endpoints = ['participants','diagnoses','studies',
+             'biospecimens','biospecimen-diagnoses',
+             'genomic-files','biospecimen-genomic-files']
 
 def main():
-    result_dict = {'participant': get_full_dataset_from_endpoint('https://kf-api-dataservice.kidsfirstdrc.org/participants'),
-                   'study': get_full_dataset_from_endpoint('https://kf-api-dataservice.kidsfirstdrc.org/studies')}
-    
-    
-    result_dfs = {}
-    for title, dataset in result_dict.items():
-        for index, result_jsons in enumerate(dataset):
-            if index == 0:
-                result_dfs.setdefault(title, get_df_from_json(result_jsons))
-            else:
-                with warnings.catch_warnings():
-                    warnings.simplefilter('ignore')
-                    temp_df = get_df_from_json(result_jsons)
-                    result_dfs.update({title: result_dfs.get(title).append(temp_df,ignore_index=True)})
+    required_endpoints = set(endpoints) - set(pre_existing_tables())
 
-    for df_title in result_dict.keys():
-        result_dfs.get(df_title).drop_duplicates()
-        result_dfs.get(df_title).to_csv(f'data_ingestion/{df_title}.tsv',sep='\t',index=None)
+    kf_ds_url_base = 'https://kf-api-dataservice.kidsfirstdrc.org'
+
+    start = time.time()
+
+    [get_full_dataset_from_endpoint(os.path.join(kf_ds_url_base,endpoint)) for endpoint in required_endpoints]
+
+    end = time.time()
+    time_elapsed_mins = (end - start) / 60
+
+    print(f'time elapsed acquiring datasets: {time_elapsed_mins}')
+
+
+def pre_existing_tables():
+    data_path = os.path.join(os.getcwd(),'data_ingestion/ingested')
+
+    tsv_s = None
+    with os.scandir(data_path) as directory:
+        tsv_s = [tsv.name.split('.')[0] for tsv in filter(is_tsv,directory)]
+
+    return tsv_s 
+
+
+
+def write_json_data_to_tsv(dataset_name: str, dataset_jsons: list):
+    prepare_ingestion_directory()
+    result_df: pd.DataFrame 
+    for index, result_jsons in enumerate(dataset_jsons):
+        if index == 0:
+            result_df = get_df_from_json(result_jsons)
+        else:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                result_df = result_df.append(get_df_from_json(result_jsons),ignore_index=True)
+    
+    result_df.drop_duplicates()
+    result_df.to_csv(f'data_ingestion/ingested/{dataset_name}.tsv',sep='\t',index=None)
 
 
 def get_df_from_json(json) -> pd.DataFrame:
@@ -38,7 +63,7 @@ def get_df_from_json(json) -> pd.DataFrame:
 
     return df
 
-def get_full_dataset_from_endpoint(url : str) -> list:
+def get_full_dataset_from_endpoint(url : str) -> None:
     result_list = []
     limit_query = 'limit=100'
 
@@ -48,7 +73,6 @@ def get_full_dataset_from_endpoint(url : str) -> list:
 
     record_count = len(resp.json().get('results'))
 
-    start = time.time()
     while((next_part := resp.json().get("_links").get('next'))):
 
         next_participant_removed_uuid = next_part.split('&')[0]
@@ -59,13 +83,20 @@ def get_full_dataset_from_endpoint(url : str) -> list:
         result_list.append(resp.json())
 
         record_count += len(resp.json().get('results'))
-        print('record_count: ' + str(record_count))
+        if record_count % 1000 == 0:
+            print(f'current record count = {record_count}')
 
-    end = time.time()
-    print('time elapsed: ' + str((end-start)/60) + ' mins')
-    print('record_count: ' + str(record_count))
+    dataset_name = url.split('/')[-1]
+    print(f'completed record_count = {record_count} for:  {dataset_name}')
+    write_json_data_to_tsv(dataset_name,result_list)
 
-    return result_list 
+
+def prepare_ingestion_directory():
+    ingestd_path = os.path.join(os.getcwd(),'data_ingestion','ingested')
+    try:
+        os.mkdir(ingestd_path)
+    except:
+        print('Ingested directory already exists.... Skipping directory creation.')
 
 
 if __name__ == "__main__":
