@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def main():
-    data_path = os.path.join(os.getcwd(),'data_ingestion')
+    data_path = os.path.join(os.getcwd(),'data_ingestion/ingested')
 
     df_dict = {}
     with os.scandir(data_path) as directory:
@@ -13,7 +13,9 @@ def main():
     
     subjects_df = join_participant_study_tables(df_dict)
 
-    subjects_df.to_csv(f'data_ingestion/subjects.tsv',sep='\t',index=None)
+    prepare_transformed_directory()
+
+    subjects_df.to_csv(f'data_ingestion/transformed/subjects.tsv',sep='\t',index=None)
 
 
 def join_participant_study_tables(df_dict: dict):
@@ -26,6 +28,13 @@ def join_participant_study_tables(df_dict: dict):
 
 def is_tsv(file : os.DirEntry):
     return file.is_file() and file.name.endswith('.tsv')
+
+def prepare_transformed_directory():
+    transformed_path = os.path.join(os.getcwd(),'data_ingestion','transformed')
+    try:
+        os.mkdir(transformed_path)
+    except:
+        print('Transformed directory already exists.... Skipping directory creation.')
 
 
 if __name__ == "__main__":
