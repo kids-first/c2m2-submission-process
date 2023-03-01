@@ -54,6 +54,8 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     kf_biospec_df['biosample_id_namespace'] = 'kidsfirst:'
     kf_biospec_df['subject_id_namespace'] = 'kidsfirst:'
     kf_biospec_df['age_at_event_days'] =  kf_biospec_df['age_at_event_days'] / 365
+    kf_biospec_df['age_at_event_days'].fillna(0, inplace=True)
+    kf_biospec_df['age_at_event_days'] = kf_biospec_df['age_at_event_days'].astype('int',copy=False)
 
 
     kf_biospec_df = kf_biospec_df[['biosample_id_namespace','kf_id_x','subject_id_namespace','kf_id_y','age_at_event_days']]
