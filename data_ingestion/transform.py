@@ -1,36 +1,49 @@
 import os
 import pandas as pd
+from typing import List
 
+ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
+ingested_path = os.path.join(ingestion_path,'ingested') 
+transformed_path = os.path.join(ingestion_path,'transformed') 
 
 def main():
-    data_path = os.path.join(os.getcwd(),'data_ingestion/ingested')
-
-    df_dict = {}
-    with os.scandir(data_path) as directory:
-        tsv_s = filter(is_tsv,directory)
-        for tsv in tsv_s:
-            df_dict.setdefault(tsv.name, pd.read_table(tsv))
-    
-    subjects_df = join_participant_study_tables(df_dict)
-
     prepare_transformed_directory()
 
-    subjects_df.to_csv(f'data_ingestion/transformed/subjects.tsv',sep='\t',index=None)
+    kf_participants = get_kf_visible_participants()
+
+    get_kf_biospecimens(kf_parts=kf_participants)
+
+def get_kf_visible_participants():
+    kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv'))
+    studies_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
+
+    visible_pariticipants = kf_participant_df.merge(studies_df,
+                                                    how='inner',
+                                                    left_on='study_id',
+                                                    right_on='studies_on_portal')
+
+    visible_pariticipants = visible_pariticipants[['kf_id','study_id','gender','ethnicity']]
+    visible_pariticipants.to_csv(os.path.join(transformed_path,'subjects.tsv'),sep='\t',index=False)
+
+    return visible_pariticipants
 
 
-def join_participant_study_tables(df_dict: dict):
-    part_df = df_dict.get('participant.tsv')
-    study_df = df_dict.get('study.tsv')
-    kf_studies = study_df.query('program == "Kids First"')
-    
+def get_kf_biospecimens(kf_parts: pd.DataFrame) -> None:
+    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
 
-    return pd.merge(part_df[['kf_id','study_id','created_at','gender','ethnicity']], kf_studies[['kf_id','program']], left_on='study_id',right_on='kf_id',how='inner')
+    kf_biospec_df = biospec_df.merge(kf_parts,
+                                     how='inner',
+                                     left_on='participant_id',
+                                     right_on='kf_id')
+
+    kf_biospec_df = kf_biospec_df[['kf_id_x','study_id','created_at','uberon_id_anatomical_site']]
+    kf_biospec_df.sort_values(by=['kf_id_x'],ascending=True,inplace=True)
+    kf_biospec_df.to_csv(os.path.join(transformed_path,'biospecimens.tsv'),sep='\t',index=False)
 
 def is_tsv(file : os.DirEntry):
     return file.is_file() and file.name.endswith('.tsv')
 
 def prepare_transformed_directory():
-    transformed_path = os.path.join(os.getcwd(),'data_ingestion','transformed')
     try:
         os.mkdir(transformed_path)
     except:
