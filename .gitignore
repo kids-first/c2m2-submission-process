@@ -12,4 +12,6 @@ pyvenv.cfg
 C2M2_datapackage.json
 prepare_C2M2_submission.py
 *.tsv
+*.csv
 *.txt
+*.pyc
