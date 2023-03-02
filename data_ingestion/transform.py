@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from typing import List
 
+from cfde_convert import gender_to_cfde_subject_sex, ethnicity_to_cfde_subject_ethnicity
+
 ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
 ingested_path = os.path.join(ingestion_path,'ingested') 
 transformed_path = os.path.join(ingestion_path,'transformed') 
@@ -11,9 +13,10 @@ def main():
 
     kf_participants = get_kf_visible_participants()
 
-    # get_kf_biospecimens(kf_parts=kf_participants)
+    get_kf_biospecimens(kf_parts=kf_participants)
 
     get_biosample_from_subject(kf_parts=kf_participants)
+
 
 def get_kf_visible_participants():
     kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv'))
@@ -24,8 +27,15 @@ def get_kf_visible_participants():
                                                     left_on='study_id',
                                                     right_on='studies_on_portal')
 
-    visible_pariticipants = visible_pariticipants[['kf_id','study_id','gender','ethnicity']]
-    visible_pariticipants.to_csv(os.path.join(transformed_path,'subjects.tsv'),sep='\t',index=False)
+    visible_pariticipants['id_namespace'] = 'kidsfirst:'
+    visible_pariticipants['project_id_namespace'] = 'kidsfirst:'
+
+    visible_pariticipants = visible_pariticipants[['id_namespace','kf_id','project_id_namespace','study_id','created_at','gender','ethnicity']]
+    visible_pariticipants = gender_to_cfde_subject_sex(visible_pariticipants)
+    visible_pariticipants['gender'].fillna('cfde_subject_sex:0',inplace=True)
+    visible_pariticipants = ethnicity_to_cfde_subject_ethnicity(visible_pariticipants)
+    visible_pariticipants.sort_values(by=['kf_id'],inplace=True)
+    visible_pariticipants.to_csv(os.path.join(transformed_path,'subject.tsv'),sep='\t',index=False)
 
     return visible_pariticipants
 
@@ -38,9 +48,9 @@ def get_kf_biospecimens(kf_parts: pd.DataFrame) -> None:
                                      left_on='participant_id',
                                      right_on='kf_id')
 
-    kf_biospec_df = kf_biospec_df[['kf_id_x','study_id','created_at','uberon_id_anatomical_site']]
+    kf_biospec_df = kf_biospec_df[['kf_id_x','study_id','created_at_x','uberon_id_anatomical_site']]
     kf_biospec_df.sort_values(by=['kf_id_x'],ascending=True,inplace=True)
-    kf_biospec_df.to_csv(os.path.join(transformed_path,'biospecimens.tsv'),sep='\t',index=False)
+    kf_biospec_df.to_csv(os.path.join(transformed_path,'biosample.tsv'),sep='\t',index=False)
 
 
 def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
@@ -55,7 +65,7 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     kf_biospec_df['subject_id_namespace'] = 'kidsfirst:'
     kf_biospec_df['age_at_event_days'] =  kf_biospec_df['age_at_event_days'] / 365
     kf_biospec_df['age_at_event_days'].fillna(0, inplace=True)
-    kf_biospec_df['age_at_event_days'] = kf_biospec_df['age_at_event_days'].astype('int',copy=False)
+    kf_biospec_df['age_at_event_days'] = kf_biospec_df['age_at_event_days'].astype('float',copy=False)
 
 
     kf_biospec_df = kf_biospec_df[['biosample_id_namespace','kf_id_x','subject_id_namespace','kf_id_y','age_at_event_days']]
