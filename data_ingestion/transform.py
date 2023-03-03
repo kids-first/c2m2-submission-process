@@ -38,6 +38,8 @@ def get_project():
                                   right_on='studies_on_portal')
 
     studies_df['id_namespace'] = id_namespace
+    studies_df['persistent_id'] = ''
+    studies_df['creation_time'] = '' 
     studies_df['abbreviation'] = studies_df['kf_id']
     studies_df.rename(columns={'kf_id':'local_id','short_name':'name','name':'description'},inplace=True)
 
