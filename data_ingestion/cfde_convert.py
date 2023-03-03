@@ -21,10 +21,8 @@ def gender_to_cfde_subject_sex(subject_df: pd.DataFrame):
 
 def ethnicity_to_cfde_subject_ethnicity(subject_df: pd.DataFrame):
     ethnicity_df = subject_df[['ethnicity']]
-    ethnicity_df['ethnicity'] = ethnicity_df['ethnicity'].apply(normalize_string)
 
     ethnicity_table = pd.read_csv(os.path.join(conversion_table_path,'subject_ethnicity.tsv'),sep='\t')
-    ethnicity_table['name'] = ethnicity_table['name'].apply(normalize_string)
 
     ethnicity_df = ethnicity_df.merge(ethnicity_table,
                     how='left',
@@ -37,7 +35,19 @@ def ethnicity_to_cfde_subject_ethnicity(subject_df: pd.DataFrame):
 
     return subject_df
 
-def normalize_string(value: str):
-    if isinstance(value,str):
-        return value.lower()
-    return "" 
+
+def tissue_type_to_cfde_disease_association(biosample_df: pd.DataFrame):
+    tissue_df = biosample_df[['source_text_tissue_type']]
+
+    disease_association_table = pd.read_csv(os.path.join(conversion_table_path,'cfde_association.txt'),sep='\t')
+
+    tissue_df = tissue_df.merge(disease_association_table,
+                    how='left',
+                    left_on='source_text_tissue_type',
+                    right_on='tissue type')[['association']]
+
+    tissue_df.rename(columns={'association':'association_type'},inplace=True)
+
+    biosample_df['source_text_tissue_type'] = tissue_df['association_type']
+
+    return biosample_df
