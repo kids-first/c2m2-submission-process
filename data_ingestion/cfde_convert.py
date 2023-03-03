@@ -39,7 +39,7 @@ def ethnicity_to_cfde_subject_ethnicity(subject_df: pd.DataFrame):
 def tissue_type_to_cfde_disease_association(biosample_df: pd.DataFrame):
     tissue_df = biosample_df[['source_text_tissue_type']]
 
-    disease_association_table = pd.read_csv(os.path.join(conversion_table_path,'cfde_association.txt'),sep='\t')
+    disease_association_table = pd.read_csv(os.path.join(conversion_table_path,'cfde_association.tsv'),sep='\t')
 
     tissue_df = tissue_df.merge(disease_association_table,
                     how='left',
