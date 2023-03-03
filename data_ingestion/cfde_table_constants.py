@@ -1,5 +1,7 @@
 
-cfde_table_columns_dict = {'subject_role_taxonomy':
+cfde_table_columns_dict = {'project':
+                           ['id_namespace','local_id','abbreviation','name','description'], #missing persistent_id, creation_time
+                            'subject_role_taxonomy':
                            ['subject_id_namespace','subject_local_id','role_id','taxonomy_id'],
                            'biosample_disease':
                            ['biosample_id_namespace','biosample_local_id','association_type'], #missing disease column

@@ -16,6 +16,8 @@ project_id_namespace = 'kidsfirst:'
 def main():
     prepare_transformed_directory()
 
+    get_project()
+
     kf_participants = get_kf_visible_participants()
 
     get_biosample(kf_parts=kf_participants)
@@ -26,6 +28,23 @@ def main():
 
     get_subject_role_taxonomy(kf_parts=kf_participants)
 
+def get_project():
+    studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
+    studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
+
+    studies_df = studies_df.merge(studies_on_portal_df,
+                                  how='inner',
+                                  left_on='kf_id',
+                                  right_on='studies_on_portal')
+
+    studies_df['id_namespace'] = id_namespace
+    studies_df['abbreviation'] = studies_df['kf_id']
+    studies_df.rename(columns={'kf_id':'local_id','short_name':'name','name':'description'},inplace=True)
+
+    studies_df = studies_df[cfde_table_columns_dict.get('project')]
+
+    studies_df.sort_values(by=['local_id'],ascending=False,inplace=True)
+    studies_df.to_csv(os.path.join(transformed_path,'project.tsv'),sep='\t',index=False)
 
 def get_kf_visible_participants():
     kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv'))
