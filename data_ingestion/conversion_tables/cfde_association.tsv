@@ -1,0 +1,12 @@
+association	tissue type	description
+cfde_disease_association_type:0	Normal	disease ruled out
+cfde_disease_association_type:0	normal	disease ruled out
+cfde_disease_association_type:0	Not Reported	disease ruled out
+cfde_disease_association_type:1	metastasis or relapse	disease observed
+cfde_disease_association_type:1	Affected	disease observed
+cfde_disease_association_type:1	relapse	disease observed
+cfde_disease_association_type:1	metastasis	disease observed
+cfde_disease_association_type:1	tumor	disease observed
+cfde_disease_association_type:1	Abnormal	disease observed
+cfde_disease_association_type:1	Tumor	disease observed
+cfde_disease_association_type:0	Saliva	disease ruled out
