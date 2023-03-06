@@ -1,14 +1,17 @@
+import os
+import json
 
-cfde_table_columns_dict = {'project':
-                           ['id_namespace','local_id','persistent_id','creation_time','abbreviation','name','description'], 
-                            'subject_role_taxonomy':
-                           ['subject_id_namespace','subject_local_id','role_id','taxonomy_id'],
-                           'biosample_disease':
-                           ['biosample_id_namespace','biosample_local_id','association_type'], #missing disease column
-                           'biosample_from_subject':
-                           ['biosample_id_namespace','biosample_local_id','subject_id_namespace','subject_local_id','age_at_sampling'],
-                           'biosample':
-                           ['id_namespace','local_id','project_id_namespace','project_local_id','created_at','uberon_id_anatomical_site'],
-                           'subject':
-                           ['id_namespace','local_id','project_id_namespace','project_local_id','created_at','gender','ethnicity']
-                           }
+
+c2m2_model_tables = ['project_in_project','project','subject_role_taxonomy','biosample_disease'
+                     'biosample_from_subject','biosample','subject']
+
+def get_table_cols_from_c2m2_json(table_name):
+    json_path = os.path.join(os.getcwd(),'draft_C2M2_submission_TSVs','C2M2_datapackage.json')
+
+    table_fields = []
+    data = json.load(open(json_path,'r'))
+    for resource in data.get('resources'):
+        if resource.get('name') == table_name:
+            for field in resource.get('schema').get('fields'):
+                table_fields.append(field.get('name'))
+    return table_fields 
