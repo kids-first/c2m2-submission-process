@@ -28,7 +28,7 @@ def main():
 
     get_biosample_disease(kf_parts=kf_participants)
 
-    # get_subject_role_taxonomy(kf_parts=kf_participants)
+    get_subject_role_taxonomy(kf_parts=kf_participants)
 
 def get_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
