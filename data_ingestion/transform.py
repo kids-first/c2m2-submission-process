@@ -9,6 +9,7 @@ from cfde_convert import gender_to_cfde_subject_sex, ethnicity_to_cfde_subject_e
 ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
 ingested_path = os.path.join(ingestion_path,'ingested') 
 transformed_path = os.path.join(ingestion_path,'transformed') 
+conversion_path = os.path.join(ingestion_path,'conversion_tables') 
 
 id_namespace = 'kidsfirst:'
 project_id_namespace = 'kidsfirst:'
@@ -25,6 +26,8 @@ def main():
     get_biosample(kf_parts=kf_participants)
 
     get_biosample_from_subject(kf_parts=kf_participants)
+
+    get_subject_disease(kf_parts=kf_participants)
 
     get_biosample_disease(kf_parts=kf_participants)
 
@@ -157,26 +160,61 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
 
 def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
+    disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
-    kf_biospec_df = biospec_df.merge(kf_parts,
-                                     how='inner',
-                                     left_on='participant_id',
-                                     right_on='local_id')
+    kf_parts_diseased = kf_parts.merge(disease_mapping_df,
+                                       how='inner',
+                                       left_on='project_local_id',
+                                       right_on='study_id').drop(columns=['study_id','DOID_description'])
 
-    kf_biospec_df['biosample_id_namespace'] = id_namespace
-    kf_biospec_df['disease'] = ' '
 
-    kf_biospec_df = tissue_type_to_cfde_disease_association(kf_biospec_df)
+    biosample_disease_df = kf_parts_diseased.merge(biospec_df,
+                                                   how='inner',
+                                                   left_on='local_id',
+                                                   right_on='participant_id'
+                                                   )
 
-    kf_biospec_df.rename(columns={'kf_id':'biosample_local_id',
+    biosample_disease_df['biosample_id_namespace'] = id_namespace
+
+    biosample_disease_df = tissue_type_to_cfde_disease_association(biosample_disease_df)
+
+    biosample_disease_df.rename(columns={'kf_id':'biosample_local_id',
                                   'created_at_x':'created_at',
-                                  'source_text_tissue_type':'association_type'},
+                                  'source_text_tissue_type':'association_type',
+                                  'DOID':'disease'},
                                   inplace=True)
 
-    kf_biospec_df = kf_biospec_df[get_table_cols_from_c2m2_json('biosample_disease')]
+    biosample_disease_df = biosample_disease_df[get_table_cols_from_c2m2_json('biosample_disease')]
 
-    kf_biospec_df.sort_values(by=['biosample_local_id'],inplace=True)
-    kf_biospec_df.to_csv(os.path.join(transformed_path,'biosample_disease.tsv'),sep='\t',index=False)
+    biosample_disease_df.drop_duplicates(inplace=True)
+    biosample_disease_df.sort_values(by=['biosample_local_id'],inplace=True)
+    biosample_disease_df.to_csv(os.path.join(transformed_path,'biosample_disease.tsv'),sep='\t',index=False)
+
+
+def get_subject_disease(kf_parts: pd.DataFrame) -> None:
+    diagnosis_df = pd.read_csv(os.path.join(ingested_path,'diagnosis.csv'),low_memory=False)
+    disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
+
+    kf_parts_diseased = kf_parts.merge(disease_mapping_df,
+                                       how='inner',
+                                       left_on='project_local_id',
+                                       right_on='study_id').drop(columns=['study_id','DOID_description'])
+
+
+    kf_parts_diseased['subject_id_namespace'] = id_namespace
+    kf_parts_diseased['association_type'] = 'cfde_disease_association_type:1'
+
+
+    kf_parts_diseased.rename(columns={'local_id':'subject_local_id',
+                                  'created_at_x':'created_at',
+                                  'DOID':'disease'},
+                                  inplace=True)
+
+    kf_parts_diseased = kf_parts_diseased[get_table_cols_from_c2m2_json('subject_disease')]
+
+    kf_parts_diseased.drop_duplicates(inplace=True)
+    kf_parts_diseased.sort_values(by=['subject_local_id'],inplace=True)
+    kf_parts_diseased.to_csv(os.path.join(transformed_path,'subject_disease.tsv'),sep='\t',index=False)
 
 
 def get_subject_role_taxonomy(kf_parts: pd.DataFrame):
