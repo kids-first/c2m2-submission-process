@@ -1,0 +1,12 @@
+id	name	description
+cfde_disease_association_type:0	Normal	disease explicitly ruled out
+cfde_disease_association_type:0	normal	disease explicitly ruled out
+cfde_disease_association_type:0	Not Reported	disease explicitly ruled out
+cfde_disease_association_type:1	metastasis or relapse	disease positively observed
+cfde_disease_association_type:1	Affected	disease positively observed
+cfde_disease_association_type:1	relapse	disease positively observed
+cfde_disease_association_type:1	metastasis	disease positively observed
+cfde_disease_association_type:1	tumor	disease positively observed
+cfde_disease_association_type:1	Abnormal	disease positively observed
+cfde_disease_association_type:1	Tumor	disease positively observed
+cfde_disease_association_type:0	Saliva	disease explicitly ruled out
