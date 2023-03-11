@@ -7,6 +7,7 @@ subject	local_id	participant	kf_id
 subject	project_local_id	participant	study_id
 subject	creation_time	participant	created_at
 subject	sex	participant	gender
+subject	ethnicity	participant	ethnicity
 biosample	local_id	biospecimen	kf_id
 biosample	creation_time	biospecimen	created_at
 biosample	anatomy	biospecimen	uberon_id_anatomical_site

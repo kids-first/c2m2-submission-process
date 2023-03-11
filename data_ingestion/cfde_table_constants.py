@@ -19,15 +19,15 @@ def get_table_cols_from_c2m2_json(table_name):
 
 
 def get_column_mappings(c2m2_entity_name: str):
-    mapping_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables','column_mapping.csv')
-    column_mapping_df = pd.read_csv(mapping_path)
+    mapping_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables','column_mapping.tsv')
+    column_mapping_df = pd.read_table(mapping_path)
     column_mapping_df.query(f'c2m2_entity == "{c2m2_entity_name}"',inplace=True)
     mapping_dict = dict(zip(column_mapping_df.kf_col,column_mapping_df.c2m2_col))
     return mapping_dict
 
 def get_hard_coded_columns(c2m2_entity_name: str):
-    constants_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables','table_constants.csv')
-    constants_df = pd.read_csv(constants_path)
+    constants_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables','table_constants.tsv')
+    constants_df = pd.read_table(constants_path)
     constants_df.query(f'entity_name == "{c2m2_entity_name}"',inplace=True)
     mapping_dict = dict(zip(constants_df.col_name,constants_df.col_value))
     return mapping_dict
