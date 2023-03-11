@@ -36,4 +36,4 @@ def add_constants(original_df: pd.DataFrame, c2m2_entity_name: str):
     for key, value in get_hard_coded_columns(c2m2_entity_name).items():
         original_df[key] = value
 
-    return original_df
+    return original_df.copy(deep=True)
