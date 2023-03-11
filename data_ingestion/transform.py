@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List
 
 from cfde_table_constants import get_table_cols_from_c2m2_json, get_column_mappings, add_constants
-from cfde_convert import kf_to_cfde_subject_value_converter 
+from cfde_convert import kf_to_cfde_subject_value_converter, remove_duplicate_columns 
 
 
 ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
@@ -76,24 +76,24 @@ def get_kf_visible_participants():
     kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv'))
     studies_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
-    visible_pariticipants = kf_participant_df.merge(studies_df,
+    visible_participants = kf_participant_df.merge(studies_df,
                                                     how='inner',
                                                     left_on='study_id',
                                                     right_on='studies_on_portal')
 
-    visible_pariticipants = add_constants(visible_pariticipants,'subject')
+    subject_df = add_constants(visible_participants,'subject')
 
-    visible_pariticipants = kf_to_cfde_subject_value_converter(visible_pariticipants,'gender')
-    visible_pariticipants = kf_to_cfde_subject_value_converter(visible_pariticipants,'ethnicity')
+    subject_df = kf_to_cfde_subject_value_converter(subject_df,'gender')
+    subject_df = kf_to_cfde_subject_value_converter(subject_df,'ethnicity')
 
-    visible_pariticipants.rename(columns=get_column_mappings('subject'),inplace=True) 
+    subject_df.rename(columns=get_column_mappings('subject'),inplace=True) 
 
-    visible_pariticipants = visible_pariticipants[get_table_cols_from_c2m2_json('subject')]
+    subject_df = subject_df[get_table_cols_from_c2m2_json('subject')]
     
-    visible_pariticipants.sort_values(by=['local_id'],inplace=True)
-    visible_pariticipants.to_csv(os.path.join(transformed_path,'subject.tsv'),sep='\t',index=False)
+    subject_df.sort_values(by=['local_id'],inplace=True)
+    subject_df.to_csv(os.path.join(transformed_path,'subject.tsv'),sep='\t',index=False)
 
-    return visible_pariticipants
+    return visible_participants
 
 
 #requires additional work for anatomy
@@ -103,12 +103,11 @@ def get_biosample(kf_parts: pd.DataFrame) -> None:
     kf_biospec_df = biospec_df.merge(kf_parts,
                                      how='inner',
                                      left_on='participant_id',
-                                     right_on='local_id')
+                                     right_on='kf_id')
 
     kf_biospec_df = add_constants(kf_biospec_df,'biosample') 
 
-    # Getting rid of conflicting subject cols
-    kf_biospec_df.drop(columns=['local_id','creation_time'],inplace=True)
+    kf_biospec_df = remove_duplicate_columns(kf_biospec_df)
 
     kf_biospec_df.rename(columns=get_column_mappings('biosample'),inplace=True)
 
@@ -128,7 +127,9 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     kf_biospec_df = biospec_df.merge(kf_parts,
                                      how='inner',
                                      left_on='participant_id',
-                                     right_on='local_id')
+                                     right_on='kf_id')
+
+    kf_biospec_df = remove_duplicate_columns(kf_biospec_df)
 
     kf_biospec_df = add_constants(kf_biospec_df,'biosample_from_subject')
     kf_biospec_df['age_at_event_days'] = kf_biospec_df['age_at_event_days'].apply(convert_days_to_years)
@@ -148,15 +149,17 @@ def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
 
     kf_parts_diseased = kf_parts.merge(disease_mapping_df,
                                        how='inner',
-                                       left_on='project_local_id',
-                                       right_on='study_id').drop(columns=['study_id','DOID_description'])
+                                       on='study_id'
+                                       ).drop(columns=['study_id','DOID_description'])
 
 
-    biosample_disease_df = kf_parts_diseased.merge(biospec_df,
-                                                   how='inner',
-                                                   left_on='local_id',
-                                                   right_on='participant_id'
-                                                   )
+    biosample_disease_df = biospec_df.merge(kf_parts_diseased,
+                                            how='inner',
+                                            left_on='participant_id',
+                                            right_on='kf_id'
+                                            )
+
+    biosample_disease_df = remove_duplicate_columns(biosample_disease_df)
 
     add_constants(biosample_disease_df,'biosample_disease')
 
@@ -176,8 +179,8 @@ def get_subject_disease(kf_parts: pd.DataFrame) -> None:
 
     kf_parts_diseased = kf_parts.merge(disease_mapping_df,
                                        how='inner',
-                                       left_on='project_local_id',
-                                       right_on='study_id').drop(columns=['study_id','DOID_description'])
+                                       on='study_id'
+                                       ).drop(columns=['study_id','DOID_description'])
 
 
     add_constants(kf_parts_diseased,'subject_disease') 
