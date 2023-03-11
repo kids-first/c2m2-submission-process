@@ -1,53 +1,46 @@
 import os
 import pandas as pd
 
+
 conversion_table_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables')
-
-def gender_to_cfde_subject_sex(subject_df: pd.DataFrame):
-    gender_df = subject_df[['gender']]
-
-    sex_table = pd.read_csv(os.path.join(conversion_table_path,'subject_sex.tsv'),sep='\t')
-
-    gender_df = gender_df.merge(sex_table,
-                    how='left',
-                    left_on='gender',
-                    right_on='name')[['id']]
-
-    gender_df.rename(columns={'id':'sex'},inplace=True)
-
-    subject_df['gender'] = gender_df['sex']
-
-    return subject_df
-
-def ethnicity_to_cfde_subject_ethnicity(subject_df: pd.DataFrame):
-    ethnicity_df = subject_df[['ethnicity']]
-
-    ethnicity_table = pd.read_csv(os.path.join(conversion_table_path,'subject_ethnicity.tsv'),sep='\t')
-
-    ethnicity_df = ethnicity_df.merge(ethnicity_table,
-                    how='left',
-                    left_on='ethnicity',
-                    right_on='name')[['id']]
-
-    ethnicity_df.rename(columns={'id':'ethnicity'},inplace=True)
-
-    subject_df['ethnicity'] = ethnicity_df['ethnicity']
-
-    return subject_df
+column_mapping_path = os.path.join(conversion_table_path,'column_mapping.tsv')
 
 
-def tissue_type_to_cfde_disease_association(biosample_df: pd.DataFrame):
-    tissue_df = biosample_df[['source_text_tissue_type']]
+def is_tsv(file : os.DirEntry):
+    return file.is_file() and file.name.endswith('.tsv')
 
-    disease_association_table = pd.read_csv(os.path.join(conversion_table_path,'cfde_association.tsv'),sep='\t')
+def get_tables():
+    with os.scandir(os.path.join(conversion_table_path)) as directory:
+        return list(filter(is_tsv,directory))
 
-    tissue_df = tissue_df.merge(disease_association_table,
-                    how='left',
-                    left_on='source_text_tissue_type',
-                    right_on='tissue type')[['association']]
+def get_column_mapping(target_col: str):
+    column_mapping_df = pd.read_table(column_mapping_path)
+    result_df = column_mapping_df.query('kf_col == @target_col')
+    return result_df.to_dict('records')[0]
 
-    tissue_df.rename(columns={'association':'association_type'},inplace=True)
 
-    biosample_df['source_text_tissue_type'] = tissue_df['association_type']
+def get_conversion_table(column: str):
+    col_mapping = get_column_mapping(column) 
 
-    return biosample_df
+    for table in get_tables():
+        if col_mapping['c2m2_col'] in table.name:
+            return pd.read_table(table)
+    
+
+def kf_to_cfde_subject_value_converter(target_df: pd.DataFrame, target_column: str):
+    col_mapping = get_column_mapping(target_column)
+
+    conversion_table = get_conversion_table(target_column) 
+    target_column_df = target_df[[target_column]]
+
+    conversion_df = target_column_df.merge(conversion_table,
+                                        how='left',
+                                        left_on=target_column,
+                                        right_on='name'
+                                        )[['id']]
+    
+    conversion_df.rename(columns={'id':col_mapping['c2m2_col']},inplace=True)
+
+    target_df[col_mapping['kf_col']] = conversion_df[col_mapping['c2m2_col']]
+
+    return target_df

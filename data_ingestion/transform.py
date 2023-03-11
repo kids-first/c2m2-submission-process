@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List
 
 from cfde_table_constants import get_table_cols_from_c2m2_json, get_column_mappings, add_constants
-from cfde_convert import gender_to_cfde_subject_sex, ethnicity_to_cfde_subject_ethnicity, tissue_type_to_cfde_disease_association
+from cfde_convert import kf_to_cfde_subject_value_converter 
 
 
 ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
@@ -83,9 +83,8 @@ def get_kf_visible_participants():
 
     visible_pariticipants = add_constants(visible_pariticipants,'subject')
 
-    visible_pariticipants = gender_to_cfde_subject_sex(visible_pariticipants)
-    visible_pariticipants['gender'].fillna('cfde_subject_sex:0',inplace=True)
-    visible_pariticipants = ethnicity_to_cfde_subject_ethnicity(visible_pariticipants)
+    visible_pariticipants = kf_to_cfde_subject_value_converter(visible_pariticipants,'gender')
+    visible_pariticipants = kf_to_cfde_subject_value_converter(visible_pariticipants,'ethnicity')
 
     visible_pariticipants.rename(columns=get_column_mappings('subject'),inplace=True) 
 
@@ -161,7 +160,7 @@ def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
 
     add_constants(biosample_disease_df,'biosample_disease')
 
-    biosample_disease_df = tissue_type_to_cfde_disease_association(biosample_disease_df)
+    biosample_disease_df = kf_to_cfde_subject_value_converter(biosample_disease_df,'source_text_tissue_type')
 
     biosample_disease_df.rename(columns=get_column_mappings('biosample_disease'),inplace=True)
 
