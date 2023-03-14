@@ -22,3 +22,5 @@ subject_disease	subject_id_namespace	kids_first:
 subject_role_taxonomy	subject_id_namespace	kids_first:
 subject_role_taxonomy	role_id	cfde_subject_role:0
 subject_role_taxonomy	taxonomy_id	NCBI:txid9606
+file_describes_biosample	file_id_namespace	kids_first:
+file_describes_biosample	biosample_id_namespace	kids_first:

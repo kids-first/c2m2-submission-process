@@ -33,6 +33,8 @@ def main():
 
     get_subject_role_taxonomy(kf_parts=kf_participants)
 
+    get_file_describes_biosample(kf_participants)
+
 def get_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
     studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
@@ -205,6 +207,40 @@ def get_subject_role_taxonomy(kf_parts: pd.DataFrame):
 
     subject_role_taxonomy_df.sort_values(by=['subject_local_id'],inplace=True)
     subject_role_taxonomy_df.to_csv(os.path.join(transformed_path,'subject_role_taxonomy.tsv'),sep='\t',index=False)
+
+def get_file_describes_biosample(kf_participants: pd.DataFrame):
+    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
+    biospec_genomic_file_df = pd.read_csv(os.path.join(ingested_path,'biospecimen_genomic_file.csv'),low_memory=False)
+    genomic_file_df = pd.read_csv(os.path.join(ingested_path,'genomic_file.csv'),low_memory=False)
+    
+    file_describes_biosample_df = biospec_df.merge(kf_participants,
+                                     how='inner',
+                                     left_on='participant_id',
+                                     right_on='kf_id')
+
+    file_describes_biosample_df = remove_duplicate_columns(file_describes_biosample_df)
+
+    file_describes_biosample_df = file_describes_biosample_df.merge(biospec_genomic_file_df,
+                                     how='inner',
+                                     left_on='kf_id',
+                                     right_on='biospecimen_id')
+
+    file_describes_biosample_df = remove_duplicate_columns(file_describes_biosample_df)
+
+    file_describes_biosample_df = file_describes_biosample_df.merge(genomic_file_df,
+                                     how='inner',
+                                     left_on='genomic_file_id',
+                                     right_on='kf_id')
+
+    file_describes_biosample_df = remove_duplicate_columns(file_describes_biosample_df)
+
+    add_constants(file_describes_biosample_df,'file_describes_biosample')
+
+    file_describes_biosample_df.rename(columns=get_column_mappings('file_describes_biosample'),inplace=True)
+    file_describes_biosample_df = file_describes_biosample_df[get_table_cols_from_c2m2_json('file_describes_biosample')]
+    file_describes_biosample_df.sort_values(by=['biosample_local_id','file_local_id'],inplace=True)
+
+    file_describes_biosample_df.to_csv(os.path.join(transformed_path,'file_describes_biosample.tsv'),sep='\t',index=False)
 
 def prepare_transformed_directory():
     try:
