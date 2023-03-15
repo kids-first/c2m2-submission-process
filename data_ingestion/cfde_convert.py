@@ -44,16 +44,3 @@ def kf_to_cfde_subject_value_converter(target_df: pd.DataFrame, target_column: s
     target_df[col_mapping['kf_col']] = conversion_df[col_mapping['c2m2_col']]
 
     return target_df
-
-
-def remove_suffix(label: str):
-    if label and label.endswith('_x'):
-        return label.removesuffix('_x')
-    else:
-        return label
-
-
-def remove_duplicate_columns(the_df: pd.DataFrame):
-    the_df.drop([col for col in the_df.columns if '_y' in col],axis='columns',inplace=True)
-    the_df.rename(remove_suffix,axis='columns',inplace=True)
-    return the_df
