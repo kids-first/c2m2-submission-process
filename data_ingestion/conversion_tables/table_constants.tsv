@@ -24,3 +24,12 @@ subject_role_taxonomy	role_id	cfde_subject_role:0
 subject_role_taxonomy	taxonomy_id	NCBI:txid9606
 file_describes_biosample	file_id_namespace	kids_first:
 file_describes_biosample	biosample_id_namespace	kids_first:
+file	id_namespace	kids_first:
+file	project_id_namespace	kids_first:
+file	compression_format	EMPTY
+file	analysis_type	EMPTY
+file	mime_type	EMPTY
+file	bundle_collection_id_namespace	EMPTY
+file	bundle_collection_local_id	EMPTY
+file	assay_type	ONTOLOGY
+file	data_type	ONTOLOGY

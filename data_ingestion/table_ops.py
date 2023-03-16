@@ -49,6 +49,9 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     the_df = add_constants(the_df, c2m2_entity_name=entity_name)
 
     the_df.rename(columns=get_column_mappings(entity_name),inplace=True)
+    # Very disgusting
+    if entity_name == 'file':
+        the_df['uncompressed_size_in_bytes'] = the_df['size_in_bytes']
 
     the_df = the_df[get_table_cols_from_c2m2_json(entity_name)]
 
