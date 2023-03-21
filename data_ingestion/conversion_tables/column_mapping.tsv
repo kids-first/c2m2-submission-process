@@ -23,7 +23,7 @@ subject_disease	disease	project_disease_matrix_only	DOID
 subject_role_taxonomy	subject_local_id	participant	kf_id
 file_describes_biosample	file_local_id	biospecimen_genomic_file	genomic_file_id
 file_describes_biosample	biosample_local_id	biospecimen_genomic_file	biospecimen_id
-file	local_id	genomic_file	kf_id
+file	local_id	biospecimen_genomic_file	genomic_file_id
 file	creation_time	genomic_file	created_at
 file	file_format	genomic_file	file_format
 file	dbgap_study_id	biospecimen	dbgap_consent_code
@@ -32,3 +32,5 @@ file	sha256	hashes	sha256
 file	md5	hashes	md5
 file	filename	aws_scrape	file_name
 file	size_in_bytes	aws_scrape	size
+file	data_type	genomic_file	data_type
+file	assay_type	sequencing_experiment	experiment_strategy
