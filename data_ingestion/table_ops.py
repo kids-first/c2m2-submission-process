@@ -27,18 +27,25 @@ class TableJoiner:
     def __init__(self,base_table: pd.DataFrame=None):
         self.base_table=base_table
 
-    def join_table(self, join_table: pd.DataFrame, left_key, right_key=None):
+    def join_table(self, join_table: pd.DataFrame, left_key, right_key=None, join_type=None):
+
+        if not join_type:
+            join_type = 'inner'
 
         merge_kw_args = None
         if right_key:
-            merge_kw_args = {'how':'inner','left_on':left_key,'right_on':right_key}
+            merge_kw_args = {'how':join_type,'left_on':left_key,'right_on':right_key}
         else:
-            merge_kw_args = {'how':'inner','on':left_key}
+            merge_kw_args = {'how':join_type,'on':left_key}
 
         self.base_table = self.base_table.merge(join_table,**merge_kw_args)
 
         self.base_table = remove_duplicate_columns(self.base_table)
 
+        return self
+
+    def left_join(self, join_table: pd.DataFrame, left_key, right_key=None):
+        self.join_table(join_table,left_key,right_key,'left')
         return self
 
     def get_result(self):
