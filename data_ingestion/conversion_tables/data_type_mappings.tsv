@@ -1,0 +1,85 @@
+id	name
+data:1916	Aligned Reads
+data:3210	Aligned Reads Index
+data:0867	Alignment Stat
+data:0867	Alignment Summary
+data:3498	Annotated Gene Fusion
+data:3498	Annotated Somatic Copy Number Segment
+data:3498	Annotated Somatic Mutation
+data:3210	Annotated Somatic Mutation Index
+data:3498	Annotated Somatic Mutations
+data:3498	Annotated Variant Call
+data:3210	Annotated Variant Call Index
+data:3914	Artifact Metric
+data:1916	Chimeric Aligned Read
+data:3498	Consensus Somatic Mutation
+data:3210	Consensus Somatic Mutation Index
+data:3914	Contamination Estimation
+data:3112	Expression
+data:3914	Familial Relationship
+data:3914	Familial Relationship Report
+data:3914	GC Metric
+data:3914	Gender Metric
+data:3914	Gender QC Metric
+data:3112	Gene Expression
+data:3112	Gene Expression Count
+data:3112	Gene Expression Quantification
+data:3498	Gene Fusions
+data:1383	Genome Aligned Read
+data:3210	Genome Aligned Read Index
+data:3498	Genomic Variant
+data:3210	Genomic Variant Index
+data:3914	Het Call QC Metric
+data:2968	Histology Images
+data:3498	Insert Size Metric
+data:2603	Isoform Expression
+data:2603	Isoform Expression Quantification
+data:3498	Masked Consensus Somatic Mutation
+data:3210	Masked Consensus Somatic Mutation Index
+data:3498	Masked Somatic Mutation
+data:3210	Masked Somatic Mutation Index
+data:0006	Not Reported
+data:2048	Operation Reports
+data:0006	Other
+data:2048	Pathology Reports
+data:3498	Pre-pass Somatic Structural Variation
+data:3210	Pre-pass Somatic Structural Variation Index
+data:3914	QC Metric
+data:3914	Quality Score Distribution
+data:3914	RNAseq Alignment Metrics
+data:2968	Radiology Images
+data:2048	Radiology Reports
+data:3498	Raw Gene Fusion
+data:3498	Raw Simple Somatic Mutation
+data:3210	Raw Simple Somatic Mutation Index
+data:3498	Raw Somatic Copy Number Segment
+data:3498	Raw Somatic Structural Variation
+data:3210	Raw Somatic Structural Variation Index
+data:3914	Recalibration Report
+data:3498	Reference Copy Number Profiling
+data:3914	Relatedness QC Metrics
+data:3498	Simple Nucleotide Variations
+data:3498	Somatic Copy Number BAF
+data:3498	Somatic Copy Number Diagram
+data:3498	Somatic Copy Number Metrics
+data:3498	Somatic Copy Number Ratio
+data:3498	Somatic Copy Number Scatter
+data:3498	Somatic Copy Number Segment
+data:3498	Somatic Copy Number Subclone Segment
+data:3498	Somatic Copy Number Variation
+data:3498	Somatic Copy Number Variations
+data:3498	Somatic Structural Variations
+data:3498	Splice Junction
+data:3914	Tool Log
+data:1916	Transcriptome Aligned Read
+data:3498	Tumor Ploidy and Purity
+data:3498	Tumor Purity
+data:3494	Unaligned Reads
+data:3498	Variant Calling Metrics
+data:3498	Variant Calls
+data:3210	Variant Calls Index
+data:3498	Variant Summary
+data:3914	WGS Metric
+data:3914	WXS Metric
+data:3498	gVCF
+data:3210	gVCF Index

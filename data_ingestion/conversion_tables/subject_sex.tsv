@@ -1,0 +1,8 @@
+id	name	description
+cfde_subject_sex:0	Indeterminate	Indeterminate
+cfde_subject_sex:0	Not Reported	Not Reported
+cfde_subject_sex:1	female	female
+cfde_subject_sex:1	Female	Female
+cfde_subject_sex:2	male	male
+cfde_subject_sex:2	Male	Male
+cfde_subject_sex:3	Intersex	Intersex
