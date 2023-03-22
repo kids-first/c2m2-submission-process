@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from typing import List
 
-from cfde_convert import kf_to_cfde_subject_value_converter
+from cfde_convert import kf_to_cfde_subject_value_converter, uberon_mapping_dict
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
 
 
@@ -96,6 +96,15 @@ def get_subject(kf_parts: pd.DataFrame):
     subject_df.to_csv(os.path.join(transformed_path,'subject.tsv'),sep='\t',index=False)
 
 
+def apply_uberon_mapping(source_text, uberon_id):
+
+    if isinstance(uberon_id,str) and uberon_id.lower().startswith('uberon'):
+        return uberon_id
+    elif isinstance(source_text,str):
+        for anatomy_term, id in uberon_mapping_dict.items():
+            if anatomy_term in source_text.lower():
+                return id
+
 #requires additional work for anatomy
 def get_biosample(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
@@ -105,6 +114,11 @@ def get_biosample(kf_parts: pd.DataFrame) -> None:
                             left_key='kf_id',
                             right_key='participant_id') \
                 .get_result()
+
+    biosample_df['uberon_id_anatomical_site'] = biosample_df.apply(lambda the_df: 
+                                                                    apply_uberon_mapping(the_df['source_text_anatomical_site'],
+                                                                                         the_df['uberon_id_anatomical_site']),
+                                                                    axis=1)
 
     biosample_df = reshape_kf_combined_to_c2m2(biosample_df,'biosample')
 
