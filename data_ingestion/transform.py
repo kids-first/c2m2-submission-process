@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List
 
 from cfde_convert import kf_to_cfde_subject_value_converter, uberon_mapping_dict
-from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
+from table_ops import TableJoiner, reshape_kf_combined_to_c2m2, project_title_row
 
 
 ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
@@ -53,6 +53,7 @@ def get_project():
     project_df['abbreviation'] = project_df['kf_id']
 
     project_df = reshape_kf_combined_to_c2m2(project_df,'project')
+    project_df = project_df.append(project_title_row,ignore_index=True)
 
     project_df.sort_values(by=['local_id'],ascending=False,inplace=True)
     project_df.to_csv(os.path.join(transformed_path,'project.tsv'),sep='\t',index=False)
@@ -107,7 +108,7 @@ def apply_uberon_mapping(source_text, uberon_id):
 
 #requires additional work for anatomy
 def get_biosample(kf_parts: pd.DataFrame) -> None:
-    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
+    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
     
     biosample_df = TableJoiner(kf_parts) \
                 .join_table(biospec_df,
@@ -123,6 +124,7 @@ def get_biosample(kf_parts: pd.DataFrame) -> None:
     biosample_df = reshape_kf_combined_to_c2m2(biosample_df,'biosample')
 
     biosample_df.sort_values(by=['local_id'],ascending=True,inplace=True)
+    biosample_df.drop_duplicates(inplace=True)
     biosample_df.to_csv(os.path.join(transformed_path,'biosample.tsv'),sep='\t',index=False)
 
 
@@ -132,7 +134,7 @@ def convert_days_to_years(days):
 
 
 def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
-    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
+    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
 
     biosample_from_subject_df = TableJoiner(kf_parts) \
                                 .join_table(biospec_df,
@@ -145,12 +147,12 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     biosample_from_subject_df = reshape_kf_combined_to_c2m2(biosample_from_subject_df,'biosample_from_subject')
 
     biosample_from_subject_df.sort_values(by=['biosample_local_id'],inplace=True)
-
+    biosample_from_subject_df.drop_duplicates(inplace=True)
     biosample_from_subject_df.to_csv(os.path.join(transformed_path,'biosample_from_subject.tsv'),sep='\t',index=False)
     
 
 def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
-    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False)
+    biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
     disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
     biosample_disease_df = TableJoiner(kf_parts) \
@@ -189,6 +191,7 @@ def get_subject_role_taxonomy(kf_parts: pd.DataFrame):
     subject_role_taxonomy_df = reshape_kf_combined_to_c2m2(subject_role_taxonomy_df,'subject_role_taxonomy')
 
     subject_role_taxonomy_df.sort_values(by=['subject_local_id'],inplace=True)
+    subject_role_taxonomy_df.drop_duplicates(inplace=True)
     subject_role_taxonomy_df.to_csv(os.path.join(transformed_path,'subject_role_taxonomy.tsv'),sep='\t',index=False)
 
 
@@ -225,8 +228,8 @@ def get_persistent_id(study, did):
             return 'drs://data.kidsfirstdrc.org/' + did
 
 def get_file(kf_genomic_files: pd.DataFrame):
-    seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False)
-    seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False)
+    seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
+    seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
 
     indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes_old.csv'),low_memory=False)
@@ -284,6 +287,7 @@ def get_file_describes_biosample(kf_genomic_files: pd.DataFrame):
 
     file_describes_biosample_df.sort_values(by=['biosample_local_id','file_local_id'],inplace=True)
 
+    file_describes_biosample_df.drop_duplicates(inplace=True)
     file_describes_biosample_df.to_csv(os.path.join(transformed_path,'file_describes_biosample.tsv'),sep='\t',index=False)
 
 

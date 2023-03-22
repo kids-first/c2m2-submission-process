@@ -2,6 +2,16 @@ import pandas as pd
 
 from cfde_table_constants import add_constants, get_column_mappings, get_table_cols_from_c2m2_json
 
+
+project_title_row = {'id_namespace':'kidsfirst:',
+                                  'local_id':'drc',
+                                  'persistent_id':'',
+                                  'creation_time':'',
+                                  'abbreviation':'KFDRC',
+                                  'description':'''A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.''',
+                                  'name':'The Gabriella Miller Kids First Pediatric Research Program'}
+
+
 def remove_suffix(label: str):
     if label and label.endswith('_y'):
         return label.removesuffix('_y')
