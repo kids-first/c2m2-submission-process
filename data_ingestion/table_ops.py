@@ -9,12 +9,25 @@ def remove_suffix(label: str):
         return label
 
 def remove_duplicate_columns(the_df: pd.DataFrame):
+    """
+    This method is intended to remove duplicate columns resulting from joining
+    kf entities. At one point, updating the primary key as a table was joined
+    and attempting to remove the duplicate led to the loss of data in left joins
+    in particular. Should continue future proofing more when time permits.
+    """
     the_df.drop([col for col in the_df.columns if '_x' in col],axis='columns',inplace=True)
     the_df.rename(remove_suffix,axis='columns',inplace=True)
     return the_df
 
 
 class TableJoiner:
+    """
+    Simplifies the act of joining kf entities. Handles duplicate columns
+    and updating the names of primary keys. Keeps the primary key of the
+    table joined from the right and renames primary key of the left table 
+    to retain that column. For the remaining columns, it simply drops 
+    the duplicates of the table joined on the left.
+    """
 
     def __init__(self,base_table: pd.DataFrame=None):
         self.base_table=base_table
