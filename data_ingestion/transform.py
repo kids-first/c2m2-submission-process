@@ -241,6 +241,14 @@ def get_file(kf_genomic_files: pd.DataFrame):
                                 right_key='s3path') \
                     .get_result()
 
+    # Required to add genomic file creation time. It was removed by an earlier join 
+    # operation targeting duplicate columns.
+    genomic_file_df = TableJoiner(genomic_file_df) \
+                    .join_table(kf_genomic_files[['kf_id','created_at']],
+                                left_key='genomic_file_id',
+                                right_key='kf_id') \
+                    .get_result()
+
 
     file_df = kf_to_cfde_subject_value_converter(genomic_file_df,'file_format')
     file_df = kf_to_cfde_subject_value_converter(file_df,'data_type')
