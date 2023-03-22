@@ -161,8 +161,6 @@ def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
                                     right_key='participant_id') \
                         .get_result()
 
-    biosample_disease_df = kf_to_cfde_subject_value_converter(biosample_disease_df,'source_text_tissue_type')
-
     biosample_disease_df = reshape_kf_combined_to_c2m2(biosample_disease_df,'biosample_disease')
 
     biosample_disease_df.drop_duplicates(inplace=True)

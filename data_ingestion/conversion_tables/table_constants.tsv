@@ -17,6 +17,7 @@ biosample	sample_prep_method
 biosample_from_subject	biosample_id_namespace	kids_first:
 biosample_from_subject	subject_id_namespace	kids_first:
 biosample_disease	biosample_id_namespace	kids_first:
+biosample_disease	association_type	cfde_disease_association_type:1
 subject_disease	association_type	cfde_disease_association_type:1
 subject_disease	subject_id_namespace	kids_first:
 subject_role_taxonomy	subject_id_namespace	kids_first:
