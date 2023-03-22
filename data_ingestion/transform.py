@@ -192,19 +192,25 @@ def get_kf_genomic_files(kf_parts: pd.DataFrame):
                     .join_table(biospec_genomic_df,
                                 left_key='kf_id',
                                 right_key='biospecimen_id') \
-                    .left_join(genomic_file_df,
+                    .join_table(genomic_file_df,
                                 left_key='genomic_file_id',
                                 right_key='kf_id') \
                     .get_result()
 
+    genomic_file_df.sort_values(by='kf_id',inplace=True)
     return genomic_file_df
 
 def modify_dbgap(study_id):
     if study_id and isinstance(study_id, str):
-        if 'sd' in study_id.lower():
-            return ' '
-        else:
+        if study_id.startswith('phs'):
             return study_id.split('.')[0]
+        else:
+            return ' '
+
+def get_persistent_id(study, did):
+    if isinstance(study,str) and isinstance(did,str):
+        if study not in ['SD_BHJXBDQK','SD_8Y99QZJJ','SD_46RR9ZR6','SD_YNSSAPHE']:
+            return 'drs://data.kidsfirstdrc.org/' + did
 
 def get_file(kf_genomic_files: pd.DataFrame):
     seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False)
@@ -240,6 +246,10 @@ def get_file(kf_genomic_files: pd.DataFrame):
     file_df = kf_to_cfde_subject_value_converter(file_df,'data_type')
     file_df = kf_to_cfde_subject_value_converter(file_df,'experiment_strategy')
     file_df['dbgap_consent_code'] = file_df['dbgap_consent_code'].apply(modify_dbgap)
+
+    file_df['persistent_id'] = file_df.apply(lambda the_df: 
+                                             get_persistent_id(the_df['study_id'],the_df['latest_did']),
+                                             axis=1)
 
     file_df = reshape_kf_combined_to_c2m2(file_df,'file')
 
