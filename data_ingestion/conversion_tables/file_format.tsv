@@ -1,10 +1,8 @@
 id	name
 	Not Reported
 	Other
-format:2572	bai
 format:3327	bai
 format:2572	bam
-	bam
 	cns
 	crai
 format:3462	cram
@@ -26,7 +24,5 @@ format:3603	png
 	tar
 	tbi
 format:3475	tsv
-format:3508	tsv
-	tsv
 	txt
 format:3016	vcf
