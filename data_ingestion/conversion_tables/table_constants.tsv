@@ -1,34 +1,35 @@
 entity_name	col_name	col_value
-project	id_namespace	kids_first:
-project	persistent_id	 
-project	creation_time	 
-project_in_project	parent_project_id_namespace	kids_first:
+project	id_namespace	kidsfirst:
+project	persistent_id	
+project	creation_time	
+project_in_project	parent_project_id_namespace	kidsfirst:
 project_in_project	parent_project_local_id	drc
-project_in_project	child_project_id_namespace	kids_first:
-subject	id_namespace	kids_first:
-subject	project_id_namespace	kids_first:
+project_in_project	child_project_id_namespace	kidsfirst:
+subject	id_namespace	kidsfirst:
+subject	project_id_namespace	kidsfirst:
 subject	persistent_id	
 subject	granularity	cfde_subject_granularity:0
 subject	age_at_enrollment	
-biosample	id_namespace	kids_first:
-biosample	project_id_namespace	kids_first:
+biosample	id_namespace	kidsfirst:
+biosample	project_id_namespace	kidsfirst:
 biosample	persistent_id	
 biosample	sample_prep_method	
-biosample_from_subject	biosample_id_namespace	kids_first:
-biosample_from_subject	subject_id_namespace	kids_first:
-biosample_disease	biosample_id_namespace	kids_first:
+biosample_from_subject	biosample_id_namespace	kidsfirst:
+biosample_from_subject	subject_id_namespace	kidsfirst:
+biosample_disease	biosample_id_namespace	kidsfirst:
 biosample_disease	association_type	cfde_disease_association_type:1
 subject_disease	association_type	cfde_disease_association_type:1
-subject_disease	subject_id_namespace	kids_first:
-subject_role_taxonomy	subject_id_namespace	kids_first:
+subject_disease	subject_id_namespace	kidsfirst:
+subject_role_taxonomy	subject_id_namespace	kidsfirst:
 subject_role_taxonomy	role_id	cfde_subject_role:0
 subject_role_taxonomy	taxonomy_id	NCBI:txid9606
-file_describes_biosample	file_id_namespace	kids_first:
-file_describes_biosample	biosample_id_namespace	kids_first:
-file	id_namespace	kids_first:
-file	project_id_namespace	kids_first:
+file_describes_biosample	file_id_namespace	kidsfirst:
+file_describes_biosample	biosample_id_namespace	kidsfirst:
+file	id_namespace	kidsfirst:
+file	project_id_namespace	kidsfirst:
 file	compression_format	
 file	analysis_type	
 file	mime_type	
 file	bundle_collection_id_namespace	
 file	bundle_collection_local_id	
+file	assay_type	
