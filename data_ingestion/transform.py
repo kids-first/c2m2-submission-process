@@ -104,7 +104,7 @@ def apply_uberon_mapping(source_text, uberon_id):
     elif isinstance(source_text,str):
         for anatomy_term, id in uberon_mapping_dict.items():
             if anatomy_term in source_text.lower():
-                return id
+                return id.upper()
 
 #requires additional work for anatomy
 def get_biosample(kf_parts: pd.DataFrame) -> None:
