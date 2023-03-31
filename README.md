@@ -43,7 +43,19 @@ source setup_evn.sh
 ./acquire_osf_c2m2_submission_tools.sh
 ```
 
-3. Execute osf script for preparing c2m2 submission 
+3. Execute kf to c2m2 etl process
+- This is currently under construction
+- For now, ingesting source data is manual
+  * Execute sql located at /kf_to_c2m2_etl/ingested/sql
+  * Export data sets from sql to /data_ingestion/ingested
+- Execute transform script
+```bash
+python /data_ingestion/transform.py
+```
+- Move tsv's from transform to draft submission directory
+- Also, add empty tables required for submission
+
+4. Execute osf script for preparing c2m2 submission 
  - Executes prepare submission script 
  - Creates frictionless validation directory 
  - Moves data files and generated files to validation directory
@@ -53,7 +65,7 @@ source setup_evn.sh
 ./prepare_c2m2_submission.sh
 ```
 
-4. Validate C2M2 submission data
+5. Validate C2M2 submission data
  - Move to the validation directory 
  - Generates the validation report 
 
@@ -61,7 +73,7 @@ source setup_evn.sh
 ./validate_submission.sh YEAR QUARTER VERSION
  ```
 
-5. Submit data to CFDE portal
+6. Submit data to CFDE portal
 
 *** Refer to Important Links #7 for additional info***
  - Login with submit tool 
