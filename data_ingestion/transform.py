@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from typing import List
 
-from cfde_convert import kf_to_cfde_subject_value_converter, uberon_mapping_dict
+from cfde_convert import kf_to_cfde_value_converter, uberon_mapping_dict
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2, project_title_row
 
 
@@ -35,7 +35,7 @@ def main():
 
     kf_genomic_files = get_kf_genomic_files(kf_parts=kf_participants)
 
-    get_file(kf_genomic_files)
+    kf_genomic_files = get_file(kf_genomic_files)
 
     get_file_describes_biosample(kf_genomic_files)
 
@@ -45,12 +45,12 @@ def get_project():
     studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
     project_df = TableJoiner(studies_df) \
-                .join_table(studies_on_portal_df,
-                            left_key='kf_id',
+                .join_kf_table(studies_on_portal_df,
+                            left_key='SD_kf_id',
                             right_key='studies_on_portal') \
                 .get_result()
 
-    project_df['abbreviation'] = project_df['kf_id']
+    project_df['abbreviation'] = project_df['SD_kf_id']
 
     project_df = reshape_kf_combined_to_c2m2(project_df,'project')
     project_df = project_df.append(project_title_row,ignore_index=True)
@@ -64,8 +64,8 @@ def get_project_in_project():
     studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
     project_in_project_df = TableJoiner(studies_df) \
-                            .join_table(studies_on_portal_df,
-                                        left_key='kf_id',
+                            .join_kf_table(studies_on_portal_df,
+                                        left_key='SD_kf_id',
                                         right_key='studies_on_portal') \
                             .get_result()
 
@@ -79,17 +79,18 @@ def get_kf_visible_participants():
     kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv')).query('visible == True')
     studies_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
-    kf_participants = kf_participant_df.merge(studies_df,
-                                                    how='inner',
-                                                    left_on='study_id',
-                                                    right_on='studies_on_portal')
+    kf_participants = TableJoiner(kf_participant_df) \
+                    .join_kf_table(studies_df,
+                                   left_key='PT_study_id',
+                                   right_key='studies_on_portal') \
+                    .get_result()
 
     return kf_participants
 
 
 def get_subject(kf_parts: pd.DataFrame):
-    subject_df = kf_to_cfde_subject_value_converter(kf_parts,'gender')
-    subject_df = kf_to_cfde_subject_value_converter(subject_df,'ethnicity')
+    subject_df = kf_to_cfde_value_converter(kf_parts,'PT_gender')
+    subject_df = kf_to_cfde_value_converter(subject_df,'PT_ethnicity')
 
     subject_df = reshape_kf_combined_to_c2m2(subject_df,'subject')
     
@@ -111,14 +112,14 @@ def get_biosample(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
     
     biosample_df = TableJoiner(kf_parts) \
-                .join_table(biospec_df,
-                            left_key='kf_id',
-                            right_key='participant_id') \
+                .join_kf_table(biospec_df,
+                            left_key='PT_kf_id',
+                            right_key='BS_participant_id') \
                 .get_result()
 
-    biosample_df['uberon_id_anatomical_site'] = biosample_df.apply(lambda the_df: 
-                                                                    apply_uberon_mapping(the_df['source_text_anatomical_site'],
-                                                                                         the_df['uberon_id_anatomical_site']),
+    biosample_df['BS_uberon_id_anatomical_site'] = biosample_df.apply(lambda the_df: 
+                                                                    apply_uberon_mapping(the_df['BS_source_text_anatomical_site'],
+                                                                                         the_df['BS_uberon_id_anatomical_site']),
                                                                     axis=1)
 
     biosample_df = reshape_kf_combined_to_c2m2(biosample_df,'biosample')
@@ -137,12 +138,12 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
 
     biosample_from_subject_df = TableJoiner(kf_parts) \
-                                .join_table(biospec_df,
-                                            left_key='kf_id',
-                                            right_key='participant_id') \
+                                .join_kf_table(biospec_df,
+                                            left_key='PT_kf_id',
+                                            right_key='BS_participant_id') \
                                 .get_result()
 
-    biosample_from_subject_df['age_at_event_days'] = biosample_from_subject_df['age_at_event_days'].apply(convert_days_to_years)
+    biosample_from_subject_df['BS_age_at_event_days'] = biosample_from_subject_df['BS_age_at_event_days'].apply(convert_days_to_years)
 
     biosample_from_subject_df = reshape_kf_combined_to_c2m2(biosample_from_subject_df,'biosample_from_subject')
 
@@ -156,12 +157,16 @@ def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
     disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
     biosample_disease_df = TableJoiner(kf_parts) \
-                        .join_table(disease_mapping_df,
-                                    left_key='study_id') \
-                        .join_table(biospec_df,
-                                    left_key='kf_id',
-                                    right_key='participant_id') \
+                        .join_kf_table(disease_mapping_df,
+                                       left_key='PT_study_id',
+                                       right_key='study_id') \
+                        .join_kf_table(biospec_df,
+                                       left_key='PT_kf_id',
+                                       right_key='BS_participant_id') \
                         .get_result()
+
+    # Ontology mapping not identified for this study
+    biosample_disease_df.drop(biosample_disease_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
 
     biosample_disease_df = reshape_kf_combined_to_c2m2(biosample_disease_df,'biosample_disease')
 
@@ -174,9 +179,13 @@ def get_subject_disease(kf_parts: pd.DataFrame) -> None:
     disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
     subject_disease_df = TableJoiner(kf_parts) \
-                        .join_table(disease_mapping_df,
-                                    left_key='study_id') \
+                        .join_kf_table(disease_mapping_df,
+                                       left_key='PT_study_id',
+                                       right_key='study_id') \
                         .get_result()
+
+    # Ontology mapping not identified for this study
+    subject_disease_df.drop(subject_disease_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
 
     subject_disease_df = reshape_kf_combined_to_c2m2(subject_disease_df, 'subject_disease')
 
@@ -201,18 +210,18 @@ def get_kf_genomic_files(kf_parts: pd.DataFrame):
     genomic_file_df = pd.read_csv(os.path.join(ingested_path,'genomic_file.csv'),low_memory=False).query('visible == True')
     
     genomic_file_df = TableJoiner(kf_parts) \
-                    .join_table(biospec_df,
-                                left_key='kf_id',
-                                right_key='participant_id') \
-                    .join_table(biospec_genomic_df,
-                                left_key='kf_id',
-                                right_key='biospecimen_id') \
-                    .join_table(genomic_file_df,
-                                left_key='genomic_file_id',
-                                right_key='kf_id') \
+                    .join_kf_table(biospec_df,
+                                left_key='PT_kf_id',
+                                right_key='BS_participant_id') \
+                    .join_kf_table(biospec_genomic_df,
+                                left_key='BS_kf_id',
+                                right_key='BG_biospecimen_id') \
+                    .join_kf_table(genomic_file_df,
+                                left_key='BG_genomic_file_id',
+                                right_key='GF_kf_id') \
                     .get_result()
 
-    genomic_file_df.sort_values(by='kf_id',inplace=True)
+    genomic_file_df.sort_values(by='GF_kf_id',inplace=True)
     return genomic_file_df
 
 def modify_dbgap(study_id):
@@ -220,65 +229,73 @@ def modify_dbgap(study_id):
         if study_id.startswith('phs'):
             return study_id.split('.')[0]
         else:
-            return ' '
+            return ''
 
-def get_persistent_id(study, did):
-    if isinstance(study,str) and isinstance(did,str):
+def get_persistent_id(study, did, md5):
+    if isinstance(study,str) and isinstance(did,str) and pd.notnull(md5):
         if study not in ['SD_BHJXBDQK','SD_8Y99QZJJ','SD_46RR9ZR6','SD_YNSSAPHE']:
             return 'drs://data.kidsfirstdrc.org/' + did
 
+def path_to_filename(path):
+    if isinstance(path,str):
+        return path.split('/')[-1]
+
 def get_file(kf_genomic_files: pd.DataFrame):
-    seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
-    seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
+
+    # Omitted due to duplicate experiment strategies per genomic file
+    # seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
+    # seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
 
     indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes_old.csv'),low_memory=False)
     aws_scrape_df = pd.read_csv(os.path.join(ingested_path,'aws_scrape.csv'),low_memory=False)
     
+    # Omitted due to duplicate experiment strategies per genomic file
+    # with_seq_df = TableJoiner(kf_genomic_files) \
+    #                     .left_join(seq_experiment_gf_df,
+    #                                left_key='GF_kf_id',
+    #                                right_key='SG_genomic_file_id') \
+    #                     .join_kf_table(seq_experiment_df,
+    #                                    left_key='SG_sequencing_experiment_id',
+    #                                    right_key='SE_kf_id') \
+    #                     .get_result()
+
+    metadata_df = TableJoiner(indexd_df) \
+            .join_kf_table(hashes_df,
+                           left_key='url',
+                           right_key='s3path') \
+            .join_kf_table(aws_scrape_df,
+                           left_key='url',
+                           right_key='s3path') \
+            .get_result()                   
+
     genomic_file_df = TableJoiner(kf_genomic_files) \
-                    .left_join(seq_experiment_gf_df,
-                               left_key='kf_id',
-                               right_key='genomic_file_id') \
-                    .left_join(seq_experiment_df,
-                               left_key='sequencing_experiment_id',
-                               right_key='kf_id') \
-                    .get_result()
-
-    genomic_file_df = TableJoiner(genomic_file_df) \
-                    .join_table(indexd_df,
-                                left_key='latest_did',
-                                right_key='did') \
-                    .join_table(hashes_df,
-                                left_key='url',
-                                right_key='s3path') \
-                    .join_table(aws_scrape_df,
-                                left_key='url',
-                                right_key='s3path') \
-                    .get_result()
-
-    # Required to add genomic file creation time. It was removed by an earlier join 
-    # operation targeting duplicate columns.
-    genomic_file_df = TableJoiner(genomic_file_df) \
-                    .join_table(kf_genomic_files[['kf_id','created_at']],
-                                left_key='genomic_file_id',
-                                right_key='kf_id') \
+                    .left_join(metadata_df,
+                               left_key='GF_latest_did',
+                               right_key='did') \
                     .get_result()
 
 
-    file_df = kf_to_cfde_subject_value_converter(genomic_file_df,'file_format')
-    file_df = kf_to_cfde_subject_value_converter(file_df,'data_type')
-    file_df = kf_to_cfde_subject_value_converter(file_df,'experiment_strategy')
-    file_df['dbgap_consent_code'] = file_df['dbgap_consent_code'].apply(modify_dbgap)
+    file_df = kf_to_cfde_value_converter(genomic_file_df,'GF_file_format')
+    file_df = kf_to_cfde_value_converter(file_df,'GF_data_type')
+    # Omitted due to duplicate experiment strategies per genomic file
+    #file_df = kf_to_cfde_value_converter(file_df,'SE_experiment_strategy')
+    file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
 
     file_df['persistent_id'] = file_df.apply(lambda the_df: 
-                                             get_persistent_id(the_df['study_id'],the_df['latest_did']),
+                                             get_persistent_id(the_df['PT_study_id'],
+                                                               the_df['GF_latest_did'],
+                                                               the_df['md5']),
                                              axis=1)
+
+    file_df['filename'] = file_df['GF_external_id'].apply(path_to_filename)
 
     file_df = reshape_kf_combined_to_c2m2(file_df,'file')
 
     file_df.drop_duplicates(inplace=True)
     file_df.sort_values(by=['local_id'],inplace=True)
     file_df.to_csv(os.path.join(transformed_path,'file.tsv'),sep='\t',index=False)
+    return genomic_file_df
 
 
 def get_file_describes_biosample(kf_genomic_files: pd.DataFrame):

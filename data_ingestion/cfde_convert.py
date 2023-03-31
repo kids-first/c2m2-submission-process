@@ -27,7 +27,7 @@ def get_conversion_table(column: str):
             return pd.read_table(table)
     
 
-def kf_to_cfde_subject_value_converter(target_df: pd.DataFrame, target_column: str):
+def kf_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
     col_mapping = get_column_mapping(target_column)
 
     conversion_table = get_conversion_table(target_column) 
