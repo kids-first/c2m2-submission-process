@@ -8,6 +8,7 @@
 /frictionless_validation
 /.vscode
 /data_ingestion/transformed
+/data_ingestion/ingested
 frictionlessreport*.txt
 pyvenv.cfg
 C2M2_datapackage.json
