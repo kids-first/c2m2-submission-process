@@ -20,31 +20,6 @@ def apply_prefix_to_columns(the_df: pd.DataFrame):
     return the_df
 
 
-def remove_suffix_right_table(label: str):
-    if label and label.endswith('_y'):
-        return label.removesuffix('_y')
-    else:
-        return label
-
-def replace_suffix_with_alias(label: str, alias: str, suffix: str):
-    if label and label.endswith(suffix):
-        return f'{alias}_' + label.removesuffix(suffix)
-    else:
-        return label
-
-
-def remove_duplicate_columns(the_df: pd.DataFrame):
-    """
-    This method is intended to remove duplicate columns resulting from joining
-    kf entities. At one point, updating the primary key as a table was joined
-    and attempting to remove the duplicate led to the loss of data in left joins
-    in particular. Should continue future proofing more when time permits.
-    """
-    the_df.drop([col for col in the_df.columns if '_x' in col],axis='columns',inplace=True)
-    the_df.rename(remove_suffix_right_table,axis='columns',inplace=True)
-    return the_df
-
-
 class TableJoiner:
     """
     Simplifies the act of joining kf entities. Handles duplicate columns
@@ -87,21 +62,6 @@ class TableJoiner:
                                                 right_on=right_key)
 
         return self
-
-    def update_primary_key(self, left_key, right_key):
-        old_primary = left_key if 'kf_id' not in left_key else right_key
-
-        rename_dict = {}
-        rename_dict['kf_id_x'], rename_dict['kf_id_y'] = old_primary, 'kf_id'
-
-        self.base_table.rename(columns=rename_dict,inplace=True)
-
-        drop_cols = [col for col in self.base_table.columns 
-                     if (isinstance(col,str) and 
-                         (col.endswith('_x') or col.endswith('_y')) and
-                          col.startswith(old_primary))]
-
-        self.base_table.drop(drop_cols,axis='columns',inplace=True)
 
 
     def get_result(self):
