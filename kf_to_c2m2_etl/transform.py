@@ -15,32 +15,32 @@ conversion_path = os.path.join(ingestion_path,'conversion_tables')
 def main():
     prepare_transformed_directory()
 
-    get_project()
+    convert_kf_to_project()
     
-    get_project_in_project()
+    convert_kf_to_project_in_project()
 
     kf_participants = get_kf_visible_participants()
 
-    get_subject(kf_parts=kf_participants)
+    convert_kf_to_subject(kf_parts=kf_participants)
 
-    get_biosample(kf_parts=kf_participants)
+    convert_kf_to_biosample(kf_parts=kf_participants)
 
-    get_biosample_from_subject(kf_parts=kf_participants)
+    convert_kf_to_biosample_from_subject(kf_parts=kf_participants)
 
-    get_subject_disease(kf_parts=kf_participants)
+    convert_kf_to_subject_disease(kf_parts=kf_participants)
 
-    get_biosample_disease(kf_parts=kf_participants)
+    convert_kf_to_biosample_disease(kf_parts=kf_participants)
 
-    get_subject_role_taxonomy(kf_parts=kf_participants)
+    convert_kf_to_subject_role_taxonomy(kf_parts=kf_participants)
 
     kf_genomic_files = get_kf_genomic_files(kf_parts=kf_participants)
 
-    kf_genomic_files = get_file(kf_genomic_files)
+    kf_genomic_files = convert_kf_to_file(kf_genomic_files)
 
-    get_file_describes_biosample(kf_genomic_files)
+    convert_kf_to_file_describes_biosample(kf_genomic_files)
 
 
-def get_project():
+def convert_kf_to_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
     studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
@@ -59,7 +59,7 @@ def get_project():
     project_df.to_csv(os.path.join(transformed_path,'project.tsv'),sep='\t',index=False)
 
 
-def get_project_in_project():
+def convert_kf_to_project_in_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
     studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
 
@@ -88,7 +88,7 @@ def get_kf_visible_participants():
     return kf_participants
 
 
-def get_subject(kf_parts: pd.DataFrame):
+def convert_kf_to_subject(kf_parts: pd.DataFrame):
     subject_df = kf_to_cfde_value_converter(kf_parts,'PT_gender')
     subject_df = kf_to_cfde_value_converter(subject_df,'PT_ethnicity')
 
@@ -108,7 +108,7 @@ def apply_uberon_mapping(source_text, uberon_id):
                 return id.upper()
 
 #requires additional work for anatomy
-def get_biosample(kf_parts: pd.DataFrame) -> None:
+def convert_kf_to_biosample(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
     
     biosample_df = TableJoiner(kf_parts) \
@@ -134,7 +134,7 @@ def convert_days_to_years(days):
         return f"{(days / 365):.02f}"
 
 
-def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
+def convert_kf_to_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
 
     biosample_from_subject_df = TableJoiner(kf_parts) \
@@ -152,7 +152,7 @@ def get_biosample_from_subject(kf_parts: pd.DataFrame) -> None:
     biosample_from_subject_df.to_csv(os.path.join(transformed_path,'biosample_from_subject.tsv'),sep='\t',index=False)
     
 
-def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
+def convert_kf_to_biosample_disease(kf_parts: pd.DataFrame) -> None:
     biospec_df = pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True')
     disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
@@ -175,7 +175,7 @@ def get_biosample_disease(kf_parts: pd.DataFrame) -> None:
     biosample_disease_df.to_csv(os.path.join(transformed_path,'biosample_disease.tsv'),sep='\t',index=False)
 
 
-def get_subject_disease(kf_parts: pd.DataFrame) -> None:
+def convert_kf_to_subject_disease(kf_parts: pd.DataFrame) -> None:
     disease_mapping_df = pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv'))
 
     subject_disease_df = TableJoiner(kf_parts) \
@@ -194,7 +194,7 @@ def get_subject_disease(kf_parts: pd.DataFrame) -> None:
     subject_disease_df.to_csv(os.path.join(transformed_path,'subject_disease.tsv'),sep='\t',index=False)
 
 
-def get_subject_role_taxonomy(kf_parts: pd.DataFrame):
+def convert_kf_to_subject_role_taxonomy(kf_parts: pd.DataFrame):
     subject_role_taxonomy_df = kf_parts.copy(deep=True)
 
     subject_role_taxonomy_df = reshape_kf_combined_to_c2m2(subject_role_taxonomy_df,'subject_role_taxonomy')
@@ -240,7 +240,7 @@ def path_to_filename(path):
     if isinstance(path,str):
         return path.split('/')[-1]
 
-def get_file(kf_genomic_files: pd.DataFrame):
+def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
 
     # Omitted due to duplicate experiment strategies per genomic file
     # seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
@@ -298,7 +298,7 @@ def get_file(kf_genomic_files: pd.DataFrame):
     return genomic_file_df
 
 
-def get_file_describes_biosample(kf_genomic_files: pd.DataFrame):
+def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
 
     file_describes_biosample_df = reshape_kf_combined_to_c2m2(kf_genomic_files,'file_describes_biosample')
 
