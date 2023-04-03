@@ -29,5 +29,5 @@ file	dbgap_study_id	biospecimen	BS_dbgap_consent_code
 file	project_local_id	participant	PT_study_id
 file	sha256	hashes	sha256
 file	md5	hashes	md5
-file	size_in_bytes	aws_scrape	size_x
+file	size_in_bytes	indexd_scrape	size
 file	data_type	genomic_file	GF_data_type

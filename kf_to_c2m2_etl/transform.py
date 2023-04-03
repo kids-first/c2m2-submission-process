@@ -247,8 +247,8 @@ def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
     # seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
 
     indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
-    hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes_old.csv'),low_memory=False)
-    aws_scrape_df = pd.read_csv(os.path.join(ingested_path,'aws_scrape.csv'),low_memory=False)
+    hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes.csv'),low_memory=False)
+    # aws_scrape_df = pd.read_csv(os.path.join(ingested_path,'aws_scrape.csv'),low_memory=False)
     
     # Omitted due to duplicate experiment strategies per genomic file
     # with_seq_df = TableJoiner(kf_genomic_files) \
@@ -262,9 +262,6 @@ def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
 
     metadata_df = TableJoiner(indexd_df) \
             .join_kf_table(hashes_df,
-                           left_key='url',
-                           right_key='s3path') \
-            .join_kf_table(aws_scrape_df,
                            left_key='url',
                            right_key='s3path') \
             .get_result()                   
