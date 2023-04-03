@@ -3,7 +3,7 @@ import pandas as pd
 from collections import OrderedDict
 
 
-conversion_table_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables')
+conversion_table_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl','conversion_tables')
 column_mapping_path = os.path.join(conversion_table_path,'column_mapping.tsv')
 
 def is_tsv(file : os.DirEntry):

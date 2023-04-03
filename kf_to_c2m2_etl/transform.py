@@ -6,10 +6,10 @@ from cfde_convert import kf_to_cfde_value_converter, uberon_mapping_dict
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2, project_title_row
 
 
-ingestion_path = os.path.join(os.getcwd(),'data_ingestion')
-ingested_path = os.path.join(ingestion_path,'ingested') 
-transformed_path = os.path.join(ingestion_path,'transformed') 
-conversion_path = os.path.join(ingestion_path,'conversion_tables') 
+etl_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl')
+ingested_path = os.path.join(etl_path,'ingested') 
+transformed_path = os.path.join(etl_path,'transformed') 
+conversion_path = os.path.join(etl_path,'conversion_tables') 
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
 
 def convert_kf_to_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
-    studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
+    studies_on_portal_df = pd.read_table(os.path.join(etl_path,'studies_on_portal.txt'))
 
     project_df = TableJoiner(studies_df) \
                 .join_kf_table(studies_on_portal_df,
@@ -61,7 +61,7 @@ def convert_kf_to_project():
 
 def convert_kf_to_project_in_project():
     studies_df = pd.read_csv(os.path.join(ingested_path,'study.csv'))
-    studies_on_portal_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
+    studies_on_portal_df = pd.read_table(os.path.join(etl_path,'studies_on_portal.txt'))
 
     project_in_project_df = TableJoiner(studies_df) \
                             .join_kf_table(studies_on_portal_df,
@@ -77,7 +77,7 @@ def convert_kf_to_project_in_project():
 
 def get_kf_visible_participants():
     kf_participant_df = pd.read_csv(os.path.join(ingested_path,'participant.csv')).query('visible == True')
-    studies_df = pd.read_table(os.path.join(ingestion_path,'studies_on_portal.txt'))
+    studies_df = pd.read_table(os.path.join(etl_path,'studies_on_portal.txt'))
 
     kf_participants = TableJoiner(kf_participant_df) \
                     .join_kf_table(studies_df,
