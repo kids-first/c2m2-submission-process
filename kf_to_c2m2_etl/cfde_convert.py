@@ -3,7 +3,7 @@ import pandas as pd
 from collections import OrderedDict
 
 
-conversion_table_path = os.path.join(os.getcwd(),'data_ingestion','conversion_tables')
+conversion_table_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl','conversion_tables')
 column_mapping_path = os.path.join(conversion_table_path,'column_mapping.tsv')
 
 def is_tsv(file : os.DirEntry):
@@ -27,7 +27,7 @@ def get_conversion_table(column: str):
             return pd.read_table(table)
     
 
-def kf_to_cfde_subject_value_converter(target_df: pd.DataFrame, target_column: str):
+def kf_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
     col_mapping = get_column_mapping(target_column)
 
     conversion_table = get_conversion_table(target_column) 

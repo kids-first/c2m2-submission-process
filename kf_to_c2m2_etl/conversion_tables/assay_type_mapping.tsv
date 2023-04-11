@@ -1,0 +1,4 @@
+id	name	description
+OBI:0002118	WXS	exome sequencing assay
+OBI:0001177	RNA-Seq	RNA sequencing assay
+OBI:0002117	WGS	whole genome sequencing assay
