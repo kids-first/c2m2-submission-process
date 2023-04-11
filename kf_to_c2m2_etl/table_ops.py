@@ -22,11 +22,12 @@ def apply_prefix_to_columns(the_df: pd.DataFrame):
 
 class TableJoiner:
     """
-    Simplifies the act of joining kf entities. Handles duplicate columns
-    and updating the names of primary keys. Keeps the primary key of the
-    table joined from the right and renames primary key of the left table 
-    to retain that column. For the remaining columns, it simply drops 
-    the duplicates of the table joined on the left.
+    Simplifies the act of joining kf entities. If the table contains a kf_id
+    primary key, then before the tables are joined, all columns are prefixed
+    with the prefix of the primary key in that table. This is only done for
+    tables containing the kf_id primary key.
+    The inspiration for this technique is derived from the sql's technique
+    of applying aliases to resolve ambiguity for duplicate columns.
     """
 
     def __init__(self,base_table: pd.DataFrame=None):
