@@ -8,11 +8,7 @@ ingested_path = os.path.join(etl_path,'ingested')
 transformed_path = os.path.join(etl_path,'transformed') 
 conversion_path = os.path.join(etl_path,'conversion_tables') 
 
-kf_table_files = {
-    'portal_studies': 'studies_on_portal.txt',
-    'study': 'study.csv',
-    'participant': 'participant.csv'
-}
+
 
 foreign_key_mappings = {
     'portal_studies_TO_study' : {'left':'studies_on_portal','right':'SD_kf_id'},
