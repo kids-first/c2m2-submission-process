@@ -18,8 +18,8 @@ foreign_key_mappings = {
     'portal_studies_TO_study' : {'left':'studies_on_portal','right':'SD_kf_id'},
     'portal_studies_TO_participant' : {'left':'studies_on_portal','right':'PT_study_id'},
     'participant_TO_biospecimen' :{'left':'PT_kf_id','right':'BS_participant_id'},
-    'biospecimen_TO_project_disease' :{'left':'PT_kf_id','right':'study_id'},
-    'participant_TO_project_disease' :{'left':'PT_kf_id','right':'study_id'},
+    'biospecimen_TO_project_disease' :{'left':'PT_study_id','right':'study_id'},
+    'participant_TO_project_disease' :{'left':'PT_study_id','right':'study_id'},
     'biospecimen_TO_biospecimen_genomic_file' :{'left':'BS_kf_id','right':'BG_biospecimen_id'},
     'biospecimen_genomic_file_TO_genomic_files' :{'left':'BG_genomic_file_id','right':'GF_kf_id'}
 }
