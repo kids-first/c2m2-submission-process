@@ -16,23 +16,45 @@ conversion_path = os.path.join(etl_path,'conversion_tables')
 def main():
     prepare_transformed_directory()
 
-    convert_kf_to_project()
+    convert_kf_to_project(kf_combined_list=['portal_studies','study'],
+                          c2m2_entity_name='project',
+                          sort_on='local_id',
+                          ascending_sort=False)
     
-    convert_kf_to_project_in_project()
+    convert_kf_to_project_in_project(kf_combined_list=['portal_studies','study'],
+                                     c2m2_entity_name='project_in_project',
+                                     sort_on='child_project_local_id',
+                                     ascending_sort=False)
 
-    kf_participants = get_kf_visible_participants()
+    convert_kf_to_subject(kf_combined_list=['portal_studies','participant'],
+                          c2m2_entity_name='subject',
+                          sort_on='local_id',
+                          ascending_sort=True)
 
-    convert_kf_to_subject(kf_parts=kf_participants)
+    convert_kf_to_biosample(kf_combined_list=['portal_studies','participant','biospecimen'],
+                            c2m2_entity_name='biosample',
+                            sort_on='local_id',
+                            ascending_sort=True)
 
-    convert_kf_to_biosample()
+    convert_kf_to_biosample_from_subject(kf_combined_list=['portal_studies','participant','biospecimen'],
+                                         c2m2_entity_name='biosample_from_subject',
+                                         sort_on='biosample_local_id',
+                                         ascending_sort=True)
 
-    convert_kf_to_biosample_from_subject()
+    convert_kf_to_subject_disease(kf_combined_list=['portal_studies','participant','project_disease'],
+                                  c2m2_entity_name='subject_disease',
+                                  sort_on='subject_local_id',
+                                  ascending_sort=True)
 
-    convert_kf_to_subject_disease()
+    convert_kf_to_biosample_disease(kf_combined_list=['portal_studies','participant','biospecimen','project_disease'],
+                                    c2m2_entity_name='biosample_disease',
+                                    sort_on='biosample_local_id',
+                                    ascending_sort=True)
 
-    convert_kf_to_biosample_disease()
-
-    convert_kf_to_subject_role_taxonomy()
+    convert_kf_to_subject_role_taxonomy(kf_combined_list=['portal_studies','participant'],
+                                        c2m2_entity_name='subject_role_taxonomy',
+                                        sort_on='subject_local_id',
+                                        ascending_sort=True)
 
     kf_genomic_files = get_kf_genomic_files()
 
@@ -40,43 +62,39 @@ def main():
 
     convert_kf_to_file_describes_biosample(kf_genomic_files)
 
+def convert_kf_to_c2m2(func):
+    def wrapper(**kwargs):
+        kf_combined_df = KfTableCombiner(kwargs['kf_combined_list']).get_combined_table()
+        combined_adjusted = func(kf_combined_df)
+        c2m2_df = reshape_kf_combined_to_c2m2(combined_adjusted,kwargs['c2m2_entity_name'])
+        
+        c2m2_df.sort_values(by=kwargs['sort_on'],
+                            ascending=kwargs['ascending_sort'],
+                            inplace=True)
 
-def convert_kf_to_project():
-    kf_combined_df = KfTableCombiner(['portal_studies','study']).get_combined_table()
+        c2m2_df.to_csv(os.path.join(transformed_path,f'{kwargs["c2m2_entity_name"]}.tsv'),
+                       sep='\t',
+                       index=False)
+    return wrapper
 
-    kf_combined_df['abbreviation'] = kf_combined_df['SD_kf_id']
+@convert_kf_to_c2m2
+def convert_kf_to_project(base_df):
+    base_df['abbreviation'] = base_df['SD_kf_id']
+    #project_df = project_df.append(project_title_row,ignore_index=True)
+    return base_df
 
-    project_df = reshape_kf_combined_to_c2m2(kf_combined_df,'project')
-    project_df = project_df.append(project_title_row,ignore_index=True)
+@convert_kf_to_c2m2
+def convert_kf_to_project_in_project(base_df):
+    return base_df
 
-    project_df.sort_values(by=['local_id'],ascending=False,inplace=True)
-    project_df.to_csv(os.path.join(transformed_path,'project.tsv'),sep='\t',index=False)
-
-
-def convert_kf_to_project_in_project():
-    kf_combined_df = KfTableCombiner(['portal_studies','study']).get_combined_table()
-
-    project_in_project_df = reshape_kf_combined_to_c2m2(kf_combined_df,'project_in_project')
-
-    project_in_project_df.sort_values(by=['child_project_local_id'],ascending=False,inplace=True)
-    project_in_project_df.to_csv(os.path.join(transformed_path,'project_in_project.tsv'),sep='\t',index=False)
-
-
-def get_kf_visible_participants():
-    return KfTableCombiner(['portal_studies','participant']).get_combined_table()
-
+@convert_kf_to_c2m2
 def convert_kf_to_subject(kf_parts: pd.DataFrame):
     subject_df = kf_to_cfde_value_converter(kf_parts,'PT_gender')
     subject_df = kf_to_cfde_value_converter(subject_df,'PT_ethnicity')
-
-    subject_df = reshape_kf_combined_to_c2m2(subject_df,'subject')
-    
-    subject_df.sort_values(by=['local_id'],inplace=True)
-    subject_df.to_csv(os.path.join(transformed_path,'subject.tsv'),sep='\t',index=False)
+    return subject_df
 
 
 def apply_uberon_mapping(source_text, uberon_id):
-
     if isinstance(uberon_id,str) and uberon_id.lower().startswith('uberon'):
         return uberon_id
     elif isinstance(source_text,str):
@@ -85,73 +103,40 @@ def apply_uberon_mapping(source_text, uberon_id):
                 return id.upper()
 
 #requires additional work for anatomy
-def convert_kf_to_biosample() -> None:
-    kf_combined_df = KfTableCombiner(['portal_studies','participant','biospecimen']).get_combined_table()
-
+@convert_kf_to_c2m2
+def convert_kf_to_biosample(kf_combined_df):
     kf_combined_df['BS_uberon_id_anatomical_site'] = kf_combined_df.apply(lambda the_df: 
                                                                     apply_uberon_mapping(the_df['BS_source_text_anatomical_site'],
                                                                                          the_df['BS_uberon_id_anatomical_site']),
                                                                     axis=1)
-
-    biosample_df = reshape_kf_combined_to_c2m2(kf_combined_df,'biosample')
-
-    biosample_df.sort_values(by=['local_id'],ascending=True,inplace=True)
-    biosample_df.drop_duplicates(inplace=True)
-    biosample_df.to_csv(os.path.join(transformed_path,'biosample.tsv'),sep='\t',index=False)
+    return kf_combined_df
 
 
 def convert_days_to_years(days):
     if days:
         return f"{(days / 365):.02f}"
 
-
-def convert_kf_to_biosample_from_subject() -> None:
-    kf_combined_df = KfTableCombiner(['portal_studies','participant','biospecimen']).get_combined_table()
-
+@convert_kf_to_c2m2
+def convert_kf_to_biosample_from_subject(kf_combined_df):
     kf_combined_df['BS_age_at_event_days'] = kf_combined_df['BS_age_at_event_days'].apply(convert_days_to_years)
-
-    biosample_from_subject_df = reshape_kf_combined_to_c2m2(kf_combined_df,'biosample_from_subject')
-
-    biosample_from_subject_df.sort_values(by=['biosample_local_id'],inplace=True)
-    biosample_from_subject_df.drop_duplicates(inplace=True)
-    biosample_from_subject_df.to_csv(os.path.join(transformed_path,'biosample_from_subject.tsv'),sep='\t',index=False)
+    return kf_combined_df
     
-
-def convert_kf_to_biosample_disease() -> None:
-    kf_combined_df = KfTableCombiner(['portal_studies','participant','biospecimen','project_disease']).get_combined_table()
-
+@convert_kf_to_c2m2
+def convert_kf_to_subject_disease(kf_combined_df):
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
+    return kf_combined_df
 
-    biosample_disease_df = reshape_kf_combined_to_c2m2(kf_combined_df,'biosample_disease')
-
-    biosample_disease_df.drop_duplicates(inplace=True)
-    biosample_disease_df.sort_values(by=['biosample_local_id'],inplace=True)
-    biosample_disease_df.to_csv(os.path.join(transformed_path,'biosample_disease.tsv'),sep='\t',index=False)
-
-
-def convert_kf_to_subject_disease() -> None:
-    kf_combined_df = KfTableCombiner(['portal_studies','participant','project_disease']).get_combined_table()
-
+@convert_kf_to_c2m2
+def convert_kf_to_biosample_disease(kf_combined_df):
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
-
-    subject_disease_df = reshape_kf_combined_to_c2m2(kf_combined_df, 'subject_disease')
-
-    subject_disease_df.drop_duplicates(inplace=True)
-    subject_disease_df.sort_values(by=['subject_local_id'],inplace=True)
-    subject_disease_df.to_csv(os.path.join(transformed_path,'subject_disease.tsv'),sep='\t',index=False)
+    return kf_combined_df
 
 
-def convert_kf_to_subject_role_taxonomy():
-    kf_combined_df = KfTableCombiner(['portal_studies','participant']).get_combined_table()
-    subject_role_taxonomy_df = kf_combined_df.copy(deep=True)
-
-    subject_role_taxonomy_df = reshape_kf_combined_to_c2m2(subject_role_taxonomy_df,'subject_role_taxonomy')
-
-    subject_role_taxonomy_df.sort_values(by=['subject_local_id'],inplace=True)
-    subject_role_taxonomy_df.drop_duplicates(inplace=True)
-    subject_role_taxonomy_df.to_csv(os.path.join(transformed_path,'subject_role_taxonomy.tsv'),sep='\t',index=False)
+@convert_kf_to_c2m2
+def convert_kf_to_subject_role_taxonomy(kf_combined_df):
+    return kf_combined_df
 
 
 def get_kf_genomic_files():
