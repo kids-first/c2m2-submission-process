@@ -9,31 +9,24 @@ transformed_path = os.path.join(etl_path,'transformed')
 conversion_path = os.path.join(etl_path,'conversion_tables') 
 
 
-
 foreign_key_mappings = {
-    'portal_studies_TO_study' : {'left':'studies_on_portal','right':'SD_kf_id'},
-    'portal_studies_TO_participant' : {'left':'studies_on_portal','right':'PT_study_id'},
-    'participant_TO_biospecimen' :{'left':'PT_kf_id','right':'BS_participant_id'},
-    'biospecimen_TO_project_disease' :{'left':'PT_study_id','right':'study_id'},
-    'participant_TO_project_disease' :{'left':'PT_study_id','right':'study_id'},
-    'biospecimen_TO_biospecimen_genomic_file' :{'left':'BS_kf_id','right':'BG_biospecimen_id'},
-    'biospecimen_genomic_file_TO_genomic_files' :{'left':'BG_genomic_file_id','right':'GF_kf_id'}
+    'portal_studies': {
+        'study': {'left': 'studies_on_portal', 'right': 'SD_kf_id'},
+        'participant': {'left': 'studies_on_portal', 'right': 'PT_study_id'}
+    },
+    'participant': {
+        'biospecimen': {'left': 'PT_kf_id', 'right': 'BS_participant_id'},
+        'project_disease': {'left': 'PT_study_id', 'right': 'study_id'}
+    },
+    'biospecimen': {
+        'project_disease': {'left': 'PT_study_id', 'right': 'study_id'},
+        'biospecimen_genomic_file': {'left': 'BS_kf_id', 'right': 'BG_biospecimen_id'}
+    },
+    'biospecimen_genomic_file': {
+        'genomic_files': {'left': 'BG_genomic_file_id', 'right': 'GF_kf_id'}
+    }
 }
 
-def get_keys(left_table_name, right_table_name) -> tuple:
-    """
-    Returns the keys to be used in joining two tables.
-
-    Args:
-        left_table_name (str): The name of the left table.
-        right_table_name (str): The name of the right table.
-
-    Returns:
-        A tuple containing the left and right keys for joining two tables.
-    """
-    for mapping, keys in foreign_key_mappings.items():
-        if left_table_name in mapping and right_table_name in mapping:
-            return keys['left'], keys['right'] 
 
 class KfTableCombiner:
     """
@@ -77,7 +70,7 @@ class KfTableCombiner:
         base_df = KfTableCombiner.df_dict[base_df_name] 
 
         for table_name in self.table_list[1:]:
-            left, right = get_keys(base_df_name,table_name)
+            left, right = foreign_key_mappings[base_df_name][table_name].values() 
             base_df = TableJoiner(base_df) \
                 .join_kf_table(KfTableCombiner.df_dict[table_name],
                                left_key=left,
