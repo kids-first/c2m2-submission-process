@@ -20,12 +20,33 @@ foreign_key_mappings = {
     'biospecimen_genomic_file_TO_genomic_files' :{'left':'BG_genomic_file_id','right':'GF_kf_id'}
 }
 
-def get_keys(left_table_name, right_table_name):
+def get_keys(left_table_name, right_table_name) -> tuple:
+    """
+    Returns the keys to be used in joining two tables.
+
+    Args:
+        left_table_name (str): The name of the left table.
+        right_table_name (str): The name of the right table.
+
+    Returns:
+        A tuple containing the left and right keys for joining two tables.
+    """
     for mapping, keys in foreign_key_mappings.items():
         if left_table_name in mapping and right_table_name in mapping:
             return keys['left'], keys['right'] 
 
 class KfTableCombiner:
+    """
+    A class for combining tables from the Kids First platform.
+
+    Attributes:
+        df_dict (dict): A dictionary containing data frames for several tables.
+        table_list (list): A list of tables to be joined.
+
+    Methods:
+        get_keys: Returns the keys to be used in joining two tables.
+        get_combined_table: Returns a data frame containing the combined table.
+    """
     df_dict = {}
     df_dict.setdefault('portal_studies',pd.read_table(os.path.join(etl_path,'studies_on_portal.txt')))
     df_dict.setdefault('project_disease',pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv')))
@@ -37,9 +58,21 @@ class KfTableCombiner:
     df_dict.setdefault('genomic_files',pd.read_csv(os.path.join(ingested_path,'genomic_file.csv'),low_memory=False).query('visible == True'))
 
     def __init__(self, tables_to_join: list):
+        """
+        Initializes the KfTableCombiner object.
+
+        Args:
+            tables_to_join (list): A list of tables to be joined.
+        """
         self.table_list = tables_to_join
 
-    def get_combined_table(self):
+    def get_combined_table(self) -> pd.DataFrame:
+        """
+        Returns a data frame containing the combined table.
+
+        Returns:
+            A data frame containing the combined table.
+        """
         base_df_name = self.table_list[0]
         base_df = KfTableCombiner.df_dict[base_df_name] 
 
@@ -54,7 +87,3 @@ class KfTableCombiner:
             
 
         return base_df
-
-if __name__ == "__main__":
-    combined = KfTableCombiner(['portal_studies','participant','biospecimen']).get_combined_table()
-    print(combined.head())
