@@ -56,11 +56,17 @@ def main():
                                         sort_on='subject_local_id',
                                         ascending_sort=True)
 
-    kf_genomic_files = get_kf_genomic_files()
 
-    kf_genomic_files = convert_kf_to_file(kf_genomic_files)
+    convert_kf_to_file(kf_combined_list=['portal_studies','participant','biospecimen','biospecimen_genomic_file','genomic_files'],
+                                          c2m2_entity_name='file',
+                                          sort_on='local_id',
+                                          ascending_sort=True)
 
-    convert_kf_to_file_describes_biosample(kf_genomic_files)
+    convert_kf_to_file_describes_biosample(kf_combined_list=['portal_studies','participant','biospecimen','biospecimen_genomic_file','genomic_files'],
+                                          c2m2_entity_name='file_describes_biosample',
+                                          sort_on=['biosample_local_id','file_local_id'],
+                                          ascending_sort=True)
+
 
 def convert_kf_to_c2m2(func):
     def wrapper(**kwargs):
@@ -72,6 +78,7 @@ def convert_kf_to_c2m2(func):
                             ascending=kwargs['ascending_sort'],
                             inplace=True)
 
+        c2m2_df.drop_duplicates(inplace=True)
         c2m2_df.to_csv(os.path.join(transformed_path,f'{kwargs["c2m2_entity_name"]}.tsv'),
                        sep='\t',
                        index=False)
@@ -139,17 +146,6 @@ def convert_kf_to_subject_role_taxonomy(kf_combined_df):
     return kf_combined_df
 
 
-def get_kf_genomic_files():
-    kf_combined_df = KfTableCombiner(['portal_studies',
-                                      'participant',
-                                      'biospecimen',
-                                      'biospecimen_genomic_file',
-                                      'genomic_files']) \
-                    .get_combined_table()
-    
-    kf_combined_df.sort_values(by='GF_kf_id',inplace=True)
-    return kf_combined_df
-
 def modify_dbgap(study_id):
     if study_id and isinstance(study_id, str):
         if study_id.startswith('phs'):
@@ -166,7 +162,8 @@ def path_to_filename(path):
     if isinstance(path,str):
         return path.split('/')[-1]
 
-def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
+@convert_kf_to_c2m2
+def convert_kf_to_file(kf_genomic_files):
 
     # Omitted due to duplicate experiment strategies per genomic file
     # seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
@@ -192,14 +189,14 @@ def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
                            right_key='s3path') \
             .get_result()                   
 
-    genomic_file_df = TableJoiner(kf_genomic_files) \
+    kf_genomic_files = TableJoiner(kf_genomic_files) \
                     .left_join(metadata_df,
                                left_key='GF_latest_did',
                                right_key='did') \
                     .get_result()
 
 
-    file_df = kf_to_cfde_value_converter(genomic_file_df,'GF_file_format')
+    file_df = kf_to_cfde_value_converter(kf_genomic_files,'GF_file_format')
     file_df = kf_to_cfde_value_converter(file_df,'GF_data_type')
     # Omitted due to duplicate experiment strategies per genomic file
     #file_df = kf_to_cfde_value_converter(file_df,'SE_experiment_strategy')
@@ -213,22 +210,26 @@ def convert_kf_to_file(kf_genomic_files: pd.DataFrame):
 
     file_df['filename'] = file_df['GF_external_id'].apply(path_to_filename)
 
-    file_df = reshape_kf_combined_to_c2m2(file_df,'file')
+    return file_df
 
-    file_df.drop_duplicates(inplace=True)
-    file_df.sort_values(by=['local_id'],inplace=True)
-    file_df.to_csv(os.path.join(transformed_path,'file.tsv'),sep='\t',index=False)
-    return genomic_file_df
-
-
+@convert_kf_to_c2m2
 def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
+    indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
+    hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes.csv'),low_memory=False)
 
-    file_describes_biosample_df = reshape_kf_combined_to_c2m2(kf_genomic_files,'file_describes_biosample')
+    metadata_df = TableJoiner(indexd_df) \
+            .join_kf_table(hashes_df,
+                           left_key='url',
+                           right_key='s3path') \
+            .get_result()                   
 
-    file_describes_biosample_df.sort_values(by=['biosample_local_id','file_local_id'],inplace=True)
+    kf_genomic_files = TableJoiner(kf_genomic_files) \
+                    .left_join(metadata_df,
+                               left_key='GF_latest_did',
+                               right_key='did') \
+                    .get_result()
 
-    file_describes_biosample_df.drop_duplicates(inplace=True)
-    file_describes_biosample_df.to_csv(os.path.join(transformed_path,'file_describes_biosample.tsv'),sep='\t',index=False)
+    return kf_genomic_files
 
 
 def prepare_transformed_directory():
