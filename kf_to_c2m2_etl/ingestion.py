@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List
 
 from kf_table_combiner import KfTableCombiner
-from pandas_io_util import PandasCsvUpdater
+from pandas_io_util import PandasCsvUpdater, handle_pre_existing_files
 from time_keeper import Timer
 
 from ingest import Ingest
@@ -35,4 +35,5 @@ def main():
                 PandasCsvUpdater(endpoint,the_df).update_csv_with_df()
 
 if __name__ == "__main__":
+    handle_pre_existing_files()
     main()
