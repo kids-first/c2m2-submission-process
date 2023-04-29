@@ -41,8 +41,8 @@ class KfTableCombiner:
         get_combined_table: Returns a data frame containing the combined table.
     """
     df_dict = {}
-    df_dict.setdefault('portal_studies',pd.read_table(os.path.join(etl_path,'studies_on_portal.txt')))
-    df_dict.setdefault('project_disease',pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv')))
+    df_dict.setdefault('portal_studies',pd.read_table(os.path.join(etl_path,'studies_on_portal.tsv')))
+    df_dict.setdefault('project_disease',pd.read_table(os.path.join(conversion_path,'project_disease_matrix_only.tsv')))
     df_dict.setdefault('study',pd.read_csv(os.path.join(ingested_path,'study.csv')))
     df_dict.setdefault('participant',pd.read_csv(os.path.join(ingested_path,'participant.csv')).query('visible == True'))
     df_dict.setdefault('biospecimen',pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True'))
