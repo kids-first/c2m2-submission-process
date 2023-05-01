@@ -1,7 +1,9 @@
 # Submission ETL Description
-This ETL (Extract, Transform, Load) pipeline is designed to convert data from the Kids First (KF) data model to the National Institutes of Health's (NIH) Common Metadata Model (C2M2) data model, with a focus on human subjects research related to cancer and birth defects. The KF data model is used to store clinical and genomic data related to pediatric cancer and birth defects research, while the NIH's C2M2 Crosscut Metadata Model is a standardized data model used for cancer and other disease research data integration and analysis.
+This ETL (Extract, Transform, Load) pipeline is designed to convert data from the Kids First (KF) data model to the National Institutes of Health's (NIH) Common Metadata Model (C2M2) data model, with a focus on human subjects research related to cancer and birth defects. The KF data model is used to store clinical and genomic data related to pediatric cancer and birth defects research, while the NIH's C2M2 Crosscut Metadata Model is a standardized data model used for cancer and other disease research data integration and analysis. 
 
 The pipeline consists of several Python scripts, including **transform.py**, which contains the transformation logic, and utilizes various libraries, including pandas for data manipulation and file handling operations. The source data is located in the "ingested" folder, and the converted data is stored in the "converted" folder. The data conversion is performed based on conversion tables and column mappings that are stored as TSV (Tab-Separated Values) files.
+
+The mapping that serves as the guideline/requirement for the transform portion of the ETL pipeline is located in this Google Drive document located [here](https://docs.google.com/spreadsheets/d/1At1q8myNqDq-2UwYvMx4_UiQsMeMzlvSFTHdPlCuuus/edit?usp=share_link).
 
 # ETL Flow
 1. File Detection: The pipeline scans the "ingested" folder for input data files and identifies the files to be processed based on their file extension.
