@@ -3,14 +3,9 @@ import pandas as pd
 from typing import List
 
 from cfde_convert import kf_to_cfde_value_converter, uberon_mapping_dict
-from table_ops import TableJoiner, reshape_kf_combined_to_c2m2, project_title_row
+from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
+from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
-
-
-etl_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl')
-ingested_path = os.path.join(etl_path,'ingested') 
-transformed_path = os.path.join(etl_path,'transformed') 
-conversion_path = os.path.join(etl_path,'conversion_tables') 
 
 
 def main():
@@ -79,7 +74,7 @@ def convert_kf_to_c2m2(func):
                             inplace=True)
 
         c2m2_df.drop_duplicates(inplace=True)
-        c2m2_df.to_csv(os.path.join(transformed_path,f'{kwargs["c2m2_entity_name"]}.tsv'),
+        c2m2_df.to_csv(os.path.join(file_locations.get_transformed_path(),f'{kwargs["c2m2_entity_name"]}.tsv'),
                        sep='\t',
                        index=False)
     return wrapper
@@ -87,7 +82,6 @@ def convert_kf_to_c2m2(func):
 @convert_kf_to_c2m2
 def convert_kf_to_project(base_df):
     base_df['abbreviation'] = base_df['SD_kf_id']
-    #project_df = project_df.append(project_title_row,ignore_index=True)
     return base_df
 
 @convert_kf_to_c2m2
@@ -169,8 +163,8 @@ def convert_kf_to_file(kf_genomic_files):
     # seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
     # seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
 
-    indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
-    hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes.csv'),low_memory=False)
+    indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
+    hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
     # aws_scrape_df = pd.read_csv(os.path.join(ingested_path,'aws_scrape.csv'),low_memory=False)
     
     # Omitted due to duplicate experiment strategies per genomic file
@@ -214,8 +208,8 @@ def convert_kf_to_file(kf_genomic_files):
 
 @convert_kf_to_c2m2
 def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
-    indexd_df = pd.read_csv(os.path.join(ingested_path,'indexd_scrape.csv'),low_memory=False)
-    hashes_df = pd.read_csv(os.path.join(ingested_path,'hashes.csv'),low_memory=False)
+    indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
+    hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
 
     metadata_df = TableJoiner(indexd_df) \
             .join_kf_table(hashes_df,
@@ -234,7 +228,7 @@ def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
 
 def prepare_transformed_directory():
     try:
-        os.mkdir(transformed_path)
+        os.mkdir(file_locations.get_transformed_path())
     except:
         print('Transformed directory already exists.... Skipping directory creation.')
 

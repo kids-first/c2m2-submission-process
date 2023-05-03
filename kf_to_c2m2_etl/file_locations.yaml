@@ -1,0 +1,7 @@
+paths:
+  etl_path: ./kf_to_c2m2_etl
+  ingested_path: ./kf_to_c2m2_etl/ingest_test
+  transformed_path: ./kf_to_c2m2_etl/transformed
+  conversion_path: ./kf_to_c2m2_etl/conversion_tables
+  c2m2_data_package_json_path: C2M2_datapackage.json
+  draft_submission_path: draft_C2M2_submission_TSVs
