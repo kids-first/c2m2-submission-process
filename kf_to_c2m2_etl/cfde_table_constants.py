@@ -14,7 +14,7 @@ def get_table_cols_from_c2m2_json(table_name):
     Returns:
         List[str]: A list of column names for the specified table.
     """
-    json_path = os.path.join(os.getcwd(),'draft_C2M2_submission_TSVs','C2M2_datapackage.json')
+    json_path = os.path.join(os.getcwd(),'C2M2_datapackage.json')
 
     table_fields = []
     data = json.load(open(json_path,'r'))
