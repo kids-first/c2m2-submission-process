@@ -128,6 +128,9 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
         the_df = the_df.astype({"uncompressed_size_in_bytes":'int',
                                 "size_in_bytes":'int'})
 
+    if entity_name == 'project':
+        the_df = pd.concat([pd.DataFrame(project_title_row,index=[0]),the_df]).reset_index(drop=True)
+
     the_df = the_df[get_table_cols_from_c2m2_json(entity_name)]
 
     return the_df
