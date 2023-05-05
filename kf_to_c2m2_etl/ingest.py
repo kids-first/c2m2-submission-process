@@ -1,4 +1,4 @@
-import logging, os, time
+import logging, os
 from collections import defaultdict
 
 from dotenv import find_dotenv, load_dotenv
@@ -140,3 +140,14 @@ class Ingest:
                 logging.info(f"    📁 {endpoint} {df.shape}")
 
         return mapped_df_dict
+
+targets = ['participants','diagnoses','studies',
+             'biospecimens','biospecimen-diagnoses',
+             'genomic-files','biospecimen-genomic-files']
+
+def write_studies_to_disk(studies_dict: dict):
+    for index, (study, endpoints) in enumerate(studies_dict.items()):
+        for endpoint, the_df in endpoints.items():
+            if isinstance(the_df,pd.DataFrame) and endpoint in targets:
+                the_df.sort_values(by=['kf_id'],inplace=True)
+                PandasCsvUpdater(endpoint,the_df).update_csv_with_df()

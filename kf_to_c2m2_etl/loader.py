@@ -51,6 +51,6 @@ def draft_table_file_path(table_name: str):
     return os.path.join(file_locations.get_draft_submission_path(),table_name)
     
 
-
-loader = TsvLoader()
-loader.load_tsvs()
+if __name__ == "__main__":
+    loader = TsvLoader()
+    loader.load_tsvs()
