@@ -8,9 +8,7 @@ from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
 
 
-def main():
-    prepare_transformed_directory()
-
+def transform_kf_to_c2m2_on_disk():
     convert_kf_to_project(kf_combined_list=['portal_studies','study'],
                           c2m2_entity_name='project',
                           sort_on='local_id',
@@ -225,13 +223,5 @@ def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
 
     return kf_genomic_files
 
-
-def prepare_transformed_directory():
-    try:
-        os.mkdir(file_locations.get_transformed_path())
-    except:
-        print('Transformed directory already exists.... Skipping directory creation.')
-
-
 if __name__ == "__main__":
-    main()
+    transform_kf_to_c2m2_on_disk()
