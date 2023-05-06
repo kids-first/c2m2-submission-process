@@ -28,6 +28,8 @@ class TsvLoader:
                 # copy the TSV file to the draft submission directory
                 shutil.copy(os.path.join(self.tsv_dir, filename), self.draft_dir)
                 self.loaded_files.add(filename.split('.')[0])
+        
+        get_dcc_df().to_csv(os.path.join(file_locations.get_draft_submission_path(),'dcc.tsv'),sep='\t',index=False)
 
     def _get_missing_c2m2_entities(self):
         with open(self.dp_path) as c2m2_json_file:
@@ -41,7 +43,7 @@ class TsvLoader:
             c2m2_description_package = json.load(c2m2_json_file)
 
             for entity in c2m2_description_package['resources']: 
-                if entity['name'] in self.unpopulated_entities:
+                if entity['name'] in self.unpopulated_entities and is_prepared_by_submitter(entity['path']):
                     columns = [field['name'] for field in entity['schema']['fields']]
                     entity_df = pd.DataFrame(columns=columns)
                     entity_df.to_csv(draft_table_file_path(entity['name']), sep='\t', index=False)
@@ -49,8 +51,33 @@ class TsvLoader:
 def draft_table_file_path(table_name: str):
     table_name = f'{table_name}.tsv' 
     return os.path.join(file_locations.get_draft_submission_path(),table_name)
-    
+
+def get_c2m2_table_origin_dict():
+    table_provider_df = pd.read_csv(file_locations.get_c2m2_table_provider_path(),sep='\t')
+    return dict(zip(table_provider_df['Table'],table_provider_df['Construction']))
+
+def is_prepared_by_submitter(table_name: str):
+    try:
+        return get_c2m2_table_origin_dict()[table_name] == 'Prepared by submitter'
+    except KeyError:
+        print(f'Table {table_name} is not a valid C2M2 table.')
+        return False
+        
+def get_dcc_df():
+    return pd.DataFrame([
+        {'id':'The Gabriella Miller Kids First Pediatric Research Program',
+         'dcc_name':'The Gabriella Miller Kids First Pediatric Research Program',
+         'dcc_abbreviation':'KFDRC',
+         'dcc_description':'A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.',
+         'contact_email':'support@kidsfirstdrc.org',
+         'contact_name':'Kids First Support',
+         'dcc_url':'https://kidsfirstdrc.org',
+         'project_id_namespace':'kidsfirst:',
+         'project_local_id':'drc',
+         }
+    ])
 
 if __name__ == "__main__":
     loader = TsvLoader()
     loader.load_tsvs()
+    
