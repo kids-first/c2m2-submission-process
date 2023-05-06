@@ -1,4 +1,4 @@
-Table (click for detailed information)	Construction
+Table	Construction
 analysis_type.tsv	Built by script
 anatomy.tsv	Built by script
 assay_type.tsv	Built by script
@@ -21,7 +21,7 @@ collection_substance.tsv	Prepared by submitter
 collection_taxonomy.tsv	Prepared by submitter
 compound.tsv	Built by script
 data_type.tsv	Built by script
-dcc.tsv (formerly primary_dcc_contact.tsv	Prepared by submitter
+dcc.tsv     Prepared by submitter
 disease.tsv	Built by script
 file.tsv	Prepared by submitter
 file_describes_biosample.tsv	Prepared by submitter
