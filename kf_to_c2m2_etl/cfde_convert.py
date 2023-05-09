@@ -7,19 +7,52 @@ conversion_table_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl','conversion_ta
 column_mapping_path = os.path.join(conversion_table_path,'column_mapping.tsv')
 
 def is_tsv(file : os.DirEntry):
+    """
+    Determines whether a given file is a TSV file.
+
+    Args:
+        file (os.DirEntry): A file object.
+
+    Returns:
+        bool: True if the file is a TSV file, False otherwise.
+    """
     return file.is_file() and file.name.endswith('.tsv')
 
 def get_tables():
+    """
+    Gets a list of TSV files from the conversion table directory.
+
+    Returns:
+        list: A list of file objects.
+    """
     with os.scandir(os.path.join(conversion_table_path)) as directory:
         return list(filter(is_tsv,directory))
 
 def get_column_mapping(target_col: str):
+    """
+    Gets a dictionary of column mappings for a given target column.
+
+    Args:
+        target_col (str): The target column to map.
+
+    Returns:
+        dict: A dictionary containing the column mappings.
+    """
     column_mapping_df = pd.read_table(column_mapping_path)
     result_df = column_mapping_df.query('kf_col == @target_col')
     return result_df.to_dict('records')[0]
 
 
 def get_conversion_table(column: str):
+    """
+    Gets the conversion table for a given column.
+
+    Args:
+        column (str): The target column to convert.
+
+    Returns:
+        pd.DataFrame: A dataframe containing the conversion table.
+    """
     col_mapping = get_column_mapping(column) 
 
     for table in get_tables():
@@ -28,6 +61,16 @@ def get_conversion_table(column: str):
     
 
 def kf_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
+    """
+    Converts a target column in a given dataframe to the corresponding CFDE value.
+
+    Args:
+        target_df (pd.DataFrame): A pandas dataframe containing the target column.
+        target_column (str): The target column to convert.
+
+    Returns:
+        pd.DataFrame: The modified dataframe with the converted column.
+    """
     col_mapping = get_column_mapping(target_column)
 
     conversion_table = get_conversion_table(target_column) 
