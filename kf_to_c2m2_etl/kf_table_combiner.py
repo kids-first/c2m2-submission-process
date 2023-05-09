@@ -2,11 +2,7 @@ import pandas as pd
 import os
 
 from table_ops import TableJoiner
-
-etl_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl')
-ingested_path = os.path.join(etl_path,'ingested') 
-transformed_path = os.path.join(etl_path,'transformed') 
-conversion_path = os.path.join(etl_path,'conversion_tables') 
+from file_locations import file_locations
 
 
 foreign_key_mappings = {
@@ -27,6 +23,21 @@ foreign_key_mappings = {
     }
 }
 
+kf_tablenames = ['study','participant','biospecimen','biospecimen_genomic_file',
+                # TODO: Using genomic_files is a hack. Find better solution later.
+                 'genomic_files']
+
+kf_tables_with_visibility = ['participant','biospecimen','biospecimen_genomic_file',
+                             'genomic_files']
+
+# Required due to ingest using endpoint names when ingesting tables
+table_to_endpoint_name = {
+    'study': 'studies',
+    'participant': 'participants',
+    'biospecimen': 'biospecimens',
+    'biospecimen_genomic_file': 'biospecimen-genomic-files',
+    'genomic_files': 'genomic-files'
+}
 
 class KfTableCombiner:
     """
@@ -41,14 +52,8 @@ class KfTableCombiner:
         get_combined_table: Returns a data frame containing the combined table.
     """
     df_dict = {}
-    df_dict.setdefault('portal_studies',pd.read_table(os.path.join(etl_path,'studies_on_portal.txt')))
-    df_dict.setdefault('project_disease',pd.read_csv(os.path.join(conversion_path,'project_disease_matrix_only.csv')))
-    df_dict.setdefault('study',pd.read_csv(os.path.join(ingested_path,'study.csv')))
-    df_dict.setdefault('participant',pd.read_csv(os.path.join(ingested_path,'participant.csv')).query('visible == True'))
-    df_dict.setdefault('biospecimen',pd.read_csv(os.path.join(ingested_path,'biospecimen.csv'),low_memory=False).query('visible == True'))
-    df_dict.setdefault('biospecimen_genomic_file',pd.read_csv(os.path.join(ingested_path,'biospecimen_genomic_file.csv'),low_memory=False).query('visible == True'))
-    # TODO: Using genomic_files is a hack. Find better solution later.
-    df_dict.setdefault('genomic_files',pd.read_csv(os.path.join(ingested_path,'genomic_file.csv'),low_memory=False).query('visible == True'))
+    df_dict.setdefault('portal_studies',pd.read_table(os.path.join(file_locations.get_etl_path(),'studies_on_portal.tsv')))
+    df_dict.setdefault('project_disease',pd.read_table(os.path.join(file_locations.get_conversion_path(),'project_disease_matrix_only.tsv')))
 
     def __init__(self, tables_to_join: list):
         """
@@ -58,6 +63,23 @@ class KfTableCombiner:
             tables_to_join (list): A list of tables to be joined.
         """
         self.table_list = tables_to_join
+        self.add_tables_to_df_dict()
+
+    def add_tables_to_df_dict(self):
+        """
+        Dynamically adds tables to the `df_dict` dictionary.
+        """
+        for table_name in self.table_list:
+            if table_name not in KfTableCombiner.df_dict:
+                file_path = os.path.join(file_locations.get_ingested_path(),f'{table_to_endpoint_name[table_name]}.csv')
+
+                if table_name in kf_tablenames:
+                    if table_name in kf_tables_with_visibility:
+                        table_df = pd.read_csv(file_path, low_memory=False).query('visible == True')
+                    else:
+                        table_df = pd.read_csv(file_path, low_memory=False)
+
+                    KfTableCombiner.df_dict[table_name] = table_df
 
     def get_combined_table(self) -> pd.DataFrame:
         """
