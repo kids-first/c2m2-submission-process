@@ -22,6 +22,9 @@ class TsvLoader:
 
         os.makedirs(self.draft_dir, exist_ok=True)
 
+        get_dcc_df().to_csv(os.path.join(self.tsv_dir,'dcc.tsv'),sep='\t',index=False)
+        get_id_namespace().to_csv(os.path.join(self.tsv_dir,'id_namespace.tsv'),sep='\t',index=False)
+
         # iterate over the TSV files in the directory
         for filename in os.listdir(self.tsv_dir):
             if isinstance(filename,str) and filename.endswith('.tsv'):
@@ -29,7 +32,6 @@ class TsvLoader:
                 shutil.copy(os.path.join(self.tsv_dir, filename), self.draft_dir)
                 self.loaded_files.add(filename.split('.')[0])
         
-        get_dcc_df().to_csv(os.path.join(file_locations.get_draft_submission_path(),'dcc.tsv'),sep='\t',index=False)
 
     def _get_missing_c2m2_entities(self):
         with open(self.dp_path) as c2m2_json_file:
@@ -63,9 +65,10 @@ def is_prepared_by_submitter(table_name: str):
         print(f'Table {table_name} is not a valid C2M2 table.')
         return False
         
+
 def get_dcc_df():
     return pd.DataFrame([
-        {'id':'The Gabriella Miller Kids First Pediatric Research Program',
+        {'id':'cfde_registry_dcc:kidsfirst',
          'dcc_name':'The Gabriella Miller Kids First Pediatric Research Program',
          'dcc_abbreviation':'KFDRC',
          'dcc_description':'A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.',
@@ -76,6 +79,17 @@ def get_dcc_df():
          'project_local_id':'drc',
          }
     ])
+
+
+def get_id_namespace():
+    return pd.DataFrame([
+        {'id':'kidsfirst:',
+         'abbreviation':'KFDRC_NS',
+         'name':'The Gabriella Miller Kids First Pediatric Research Program',
+         'description':'A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.',
+         }
+    ])
+
 
 if __name__ == "__main__":
     loader = TsvLoader()
