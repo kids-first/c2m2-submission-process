@@ -17,3 +17,4 @@ prepare_C2M2_submission.py
 *.csv
 *.txt
 *.pyc
+*.zip
