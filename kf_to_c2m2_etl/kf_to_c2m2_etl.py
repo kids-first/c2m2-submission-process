@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import shutil
 
 from pandas_io_util import handle_pre_existing_files
 
@@ -25,16 +26,24 @@ def main():
     TsvLoader().load_tsvs()
 
 
-    
-
-
 def prepare_etl_directories():
-    try:
-        os.mkdir(file_locations.get_ingested_path())
-        os.mkdir(file_locations.get_transformed_path())
-        os.mkdir(file_locations.get_draft_submission_path())
-    except:
-        print('Transformed directory already exists.... Skipping directory creation.') 
+    directories = [
+        file_locations.get_ingested_path(),
+        file_locations.get_transformed_path(),
+        file_locations.get_draft_submission_path(),
+        file_locations.get_auto_gen_path()
+    ]
+    
+    for directory in directories:
+        if os.path.isdir(directory):
+            print(f"Clearing directory '{directory}'")
+            shutil.rmtree(directory)
+            
+        try:
+            os.mkdir(directory)
+        except FileExistsError:
+            print(f"Directory '{directory}' already exists. Skipping directory creation.") 
+
 
 if __name__ == "__main__":
     prepare_etl_directories()
