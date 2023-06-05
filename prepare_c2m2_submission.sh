@@ -6,6 +6,7 @@ if [[ ! -e "frictionless_validation" ]]; then
     mkdir frictionless_validation
 else
     echo "frictionless_validation already exists."
+    rm -rf frictionless_validation/*
 fi
 
 # Moves data files and generated files to validation directory
