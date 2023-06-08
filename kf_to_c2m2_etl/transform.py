@@ -1,12 +1,14 @@
 import os
 import pandas as pd
 from typing import List
+import logging 
 
 from cfde_convert import kf_to_cfde_value_converter, uberon_mapping_dict
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
 from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
 
+logging.basicConfig(level=logging.INFO)
 
 def transform_kf_to_c2m2_on_disk():
     convert_kf_to_project(kf_combined_list=['portal_studies','study'],
@@ -79,15 +81,18 @@ def convert_kf_to_c2m2(func):
 
 @convert_kf_to_c2m2
 def convert_kf_to_project(base_df):
+    logging.info('Converting kf to c2m2 project')
     base_df['abbreviation'] = base_df['SD_kf_id']
     return base_df
 
 @convert_kf_to_c2m2
 def convert_kf_to_project_in_project(base_df):
+    logging.info('Converting kf to c2m2 project in project')
     return base_df
 
 @convert_kf_to_c2m2
 def convert_kf_to_subject(kf_parts: pd.DataFrame):
+    logging.info('Converting kf to c2m2 subject')
     subject_df = kf_to_cfde_value_converter(kf_parts,'PT_gender')
     subject_df = kf_to_cfde_value_converter(subject_df,'PT_ethnicity')
     return subject_df
@@ -104,6 +109,7 @@ def apply_uberon_mapping(source_text, uberon_id):
 #requires additional work for anatomy
 @convert_kf_to_c2m2
 def convert_kf_to_biosample(kf_combined_df):
+    logging.info('Converting kf to c2m2 biosample')
     kf_combined_df['BS_uberon_id_anatomical_site'] = kf_combined_df.apply(lambda the_df: 
                                                                     apply_uberon_mapping(the_df['BS_source_text_anatomical_site'],
                                                                                          the_df['BS_uberon_id_anatomical_site']),
@@ -117,17 +123,20 @@ def convert_days_to_years(days):
 
 @convert_kf_to_c2m2
 def convert_kf_to_biosample_from_subject(kf_combined_df):
+    logging.info('Converting kf to c2m2 biosample from subject')
     kf_combined_df['BS_age_at_event_days'] = kf_combined_df['BS_age_at_event_days'].apply(convert_days_to_years)
     return kf_combined_df
     
 @convert_kf_to_c2m2
 def convert_kf_to_subject_disease(kf_combined_df):
+    logging.info('Converting kf to c2m2 subject disease')
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
     return kf_combined_df
 
 @convert_kf_to_c2m2
 def convert_kf_to_biosample_disease(kf_combined_df):
+    logging.info('Converting kf to c2m2 biosample disease')
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
     return kf_combined_df
@@ -135,6 +144,7 @@ def convert_kf_to_biosample_disease(kf_combined_df):
 
 @convert_kf_to_c2m2
 def convert_kf_to_subject_role_taxonomy(kf_combined_df):
+    logging.info('Converting kf to c2m2 subject role taxomonmy')
     return kf_combined_df
 
 
@@ -156,25 +166,11 @@ def path_to_filename(path):
 
 @convert_kf_to_c2m2
 def convert_kf_to_file(kf_genomic_files):
-
-    # Omitted due to duplicate experiment strategies per genomic file
-    # seq_experiment_gf_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment_genomic_file.csv'),low_memory=False).query('visible == True')
-    # seq_experiment_df = pd.read_csv(os.path.join(ingested_path,'sequencing_experiment.csv'),low_memory=False).query('visible == True')
+    logging.info('Converting kf to c2m2 file')
 
     indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
-    # aws_scrape_df = pd.read_csv(os.path.join(ingested_path,'aws_scrape.csv'),low_memory=False)
     
-    # Omitted due to duplicate experiment strategies per genomic file
-    # with_seq_df = TableJoiner(kf_genomic_files) \
-    #                     .left_join(seq_experiment_gf_df,
-    #                                left_key='GF_kf_id',
-    #                                right_key='SG_genomic_file_id') \
-    #                     .join_kf_table(seq_experiment_df,
-    #                                    left_key='SG_sequencing_experiment_id',
-    #                                    right_key='SE_kf_id') \
-    #                     .get_result()
-
     metadata_df = TableJoiner(indexd_df) \
             .join_kf_table(hashes_df,
                            left_key='url',
@@ -190,10 +186,8 @@ def convert_kf_to_file(kf_genomic_files):
 
     file_df = kf_to_cfde_value_converter(kf_genomic_files,'GF_file_format')
     file_df = kf_to_cfde_value_converter(file_df,'GF_data_type')
-    # Omitted due to duplicate experiment strategies per genomic file
-    #file_df = kf_to_cfde_value_converter(file_df,'SE_experiment_strategy')
+    
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
-
     file_df['persistent_id'] = file_df.apply(lambda the_df: 
                                              get_persistent_id(the_df['PT_study_id'],
                                                                the_df['GF_latest_did'],
@@ -206,6 +200,7 @@ def convert_kf_to_file(kf_genomic_files):
 
 @convert_kf_to_c2m2
 def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
+    logging.info('Converting kf to c2m2 file describes biosample')
     indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
 
