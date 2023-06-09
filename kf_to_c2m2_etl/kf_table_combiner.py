@@ -53,7 +53,7 @@ class KfTableCombiner:
     """
     df_dict = {}
     df_dict.setdefault('portal_studies',pd.read_table(os.path.join(file_locations.get_etl_path(),'studies_on_portal.tsv')))
-    df_dict.setdefault('project_disease',pd.read_table(os.path.join(file_locations.get_conversion_path(),'project_disease_matrix_only.tsv')))
+    df_dict.setdefault('project_disease',pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv')))
 
     def __init__(self, tables_to_join: list):
         """

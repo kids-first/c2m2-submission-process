@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 from collections import OrderedDict
+from file_locations import file_locations
 
 
-conversion_table_path = os.path.join(os.getcwd(),'kf_to_c2m2_etl','conversion_tables')
-column_mapping_path = os.path.join(conversion_table_path,'column_mapping.tsv')
+column_mapping_path = os.path.join(file_locations.get_kf_to_c2m2_mappings_path(),'column_mapping.tsv')
 
 def is_tsv(file : os.DirEntry):
     """
@@ -25,8 +25,14 @@ def get_tables():
     Returns:
         list: A list of file objects.
     """
-    with os.scandir(os.path.join(conversion_table_path)) as directory:
-        return list(filter(is_tsv,directory))
+    table_paths = []
+
+    table_directories = [file_locations.get_cfde_reference_table_path(),file_locations.get_ontology_mappings_path()]
+    for file_path in table_directories: 
+        with os.scandir(file_path) as directory:
+            table_paths += list(filter(is_tsv,directory))
+    
+    return table_paths
 
 def get_column_mapping(target_col: str):
     """
@@ -88,7 +94,7 @@ def kf_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
 
     return target_df
 
-uberon_mapping_df = pd.read_csv(os.path.join(conversion_table_path,'anatomy_fixed_tabs.tsv'),sep='\t').fillna('')
+uberon_mapping_df = pd.read_csv(os.path.join(file_locations.get_ontology_mappings_path(),'anatomy_fixed_tabs.tsv'),sep='\t').fillna('')
 uberon_mapping_df['composition_term'] = uberon_mapping_df['composition_term'].apply(str.lower)
 uberon_mapping_df['uberon_id'] = uberon_mapping_df['uberon_id'].apply(str.lower)
 uberon_mapping_df = uberon_mapping_df[::-1]
