@@ -31,3 +31,4 @@ file	sha256	hashes	sha256
 file	md5	hashes	md5
 file	size_in_bytes	indexd_scrape	size
 file	data_type	genomic_file	GF_data_type
+file	assay_type	genomic_file	SE_experiment_strategy
