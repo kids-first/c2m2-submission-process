@@ -143,7 +143,8 @@ class Ingest:
 
 targets = ['participants','diagnoses','studies',
              'biospecimens','biospecimen-diagnoses',
-             'genomic-files','biospecimen-genomic-files']
+             'genomic-files','biospecimen-genomic-files',
+             'sequencing-experiment-genomic-files','sequencing-experiments']
 
 def write_studies_to_disk(studies_dict: dict):
     for index, (study, endpoints) in enumerate(studies_dict.items()):
