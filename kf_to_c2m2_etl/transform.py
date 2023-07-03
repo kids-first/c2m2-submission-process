@@ -52,7 +52,8 @@ def transform_kf_to_c2m2_on_disk():
                                         ascending_sort=True)
 
 
-    convert_kf_to_file(kf_combined_list=['portal_studies','participant','biospecimen','biospecimen_genomic_file','genomic_files'],
+    convert_kf_to_file(kf_combined_list=['portal_studies','participant','biospecimen',
+                                         'biospecimen_genomic_file','genomic_files'],
                                           c2m2_entity_name='file',
                                           sort_on='local_id',
                                           ascending_sort=True)
@@ -168,6 +169,14 @@ def path_to_filename(path):
 def convert_kf_to_file(kf_genomic_files):
     logging.info('Converting kf to c2m2 file')
 
+    seq_exp_gen_files_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'sequencing-experiment-genomic-files.csv'),
+                                       low_memory=False) \
+                                        .query('visible == True')
+
+    seq_exp_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'sequencing-experiments.csv'),
+                                       low_memory=False) \
+                                        .query('visible == True')
+
     indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
     
@@ -183,9 +192,21 @@ def convert_kf_to_file(kf_genomic_files):
                                right_key='did') \
                     .get_result()
 
+    experiment_strategy = TableJoiner(seq_exp_gen_files_df) \
+                    .join_kf_table(seq_exp_df,
+                               left_key='SG_sequencing_experiment_id',
+                               right_key='SE_kf_id',) \
+                    .get_result()
+
+    kf_genomic_files = TableJoiner(kf_genomic_files) \
+                    .left_join(experiment_strategy,
+                               left_key='GF_kf_id',
+                               right_key='SG_genomic_file_id') \
+                    .get_result()
 
     file_df = kf_to_cfde_value_converter(kf_genomic_files,'GF_file_format')
     file_df = kf_to_cfde_value_converter(file_df,'GF_data_type')
+    file_df = kf_to_cfde_value_converter(file_df,'SE_experiment_strategy')
     
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
     file_df['persistent_id'] = file_df.apply(lambda the_df: 
