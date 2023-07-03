@@ -148,7 +148,9 @@ endpoint_targets = ['studies',
                     'diagnoses',
                     'biospecimen-diagnoses',
                     'biospecimen-genomic-files',
-                    'genomic-files']
+                    'genomic-files',
+                    'sequencing-experiment-genomic-files',
+                    'sequencing-experiments']
 
 
 def write_studies_to_disk(studies_dict: dict):
