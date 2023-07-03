@@ -19,16 +19,23 @@ foreign_key_mappings = {
         'biospecimen_genomic_file': {'left': 'BS_kf_id', 'right': 'BG_biospecimen_id'}
     },
     'biospecimen_genomic_file': {
-        'genomic_files': {'left': 'BG_genomic_file_id', 'right': 'GF_kf_id'}
+        'genomic_files': {'left': 'BG_genomic_file_id', 'right': 'GF_kf_id'},
+        'sequencing_experiment_genomic_file': {'left': '', 'right': ''}
+    },
+    'genomic_files': {
+        'sequencing_experiment_genomic_file': {'left':'GF_kf_id', 'right':'SG_genomic_file_id'}
+    },
+    'sequencing_experiment_genomic_file': {
+        'sequencing_experiment': {'left': 'SG_sequencing_experiment_id', 'right': 'SE_kf_id'}
     }
 }
 
 kf_tablenames = ['study','participant','biospecimen','biospecimen_genomic_file',
                 # TODO: Using genomic_files is a hack. Find better solution later.
-                 'genomic_files']
+                 'genomic_files','sequencing_experiment_genomic_file','sequencing_experiment']
 
 kf_tables_with_visibility = ['participant','biospecimen','biospecimen_genomic_file',
-                             'genomic_files']
+                             'genomic_files','sequencing_experiment_genomic_file','sequencing_experiment']
 
 # Required due to ingest using endpoint names when ingesting tables
 table_to_endpoint_name = {
@@ -36,7 +43,9 @@ table_to_endpoint_name = {
     'participant': 'participants',
     'biospecimen': 'biospecimens',
     'biospecimen_genomic_file': 'biospecimen-genomic-files',
-    'genomic_files': 'genomic-files'
+    'genomic_files': 'genomic-files',
+    'sequencing_experiment_genomic_file': 'sequencing-experiment-genomic-files',
+    'sequencing_experiment': 'sequencing-experiments'
 }
 
 class KfTableCombiner:
