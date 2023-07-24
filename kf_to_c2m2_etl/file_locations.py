@@ -25,6 +25,15 @@ class FileLocations:
     def get_conversion_path(self):
         return self.config['paths']['conversion_path']
 
+    def get_cfde_reference_table_path(self):
+        return self.config['paths']['cfde_ref_table_path']
+
+    def get_kf_to_c2m2_mappings_path(self):
+        return self.config['paths']['kf_to_c2m2_mappings_path']
+
+    def get_ontology_mappings_path(self):
+        return self.config['paths']['ontology_mappings_path']
+
     def get_draft_submission_path(self):
         return self.config['paths']['draft_submission_path']
 
