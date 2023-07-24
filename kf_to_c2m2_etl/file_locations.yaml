@@ -1,6 +1,6 @@
 paths:
   etl_path: ./kf_to_c2m2_etl
-  ingested_path: ./kf_to_c2m2_etl/ingest_test
+  ingested_path: ./kf_to_c2m2_etl/ingested/tables
   transformed_path: ./kf_to_c2m2_etl/transformed
   cfde_ref_table_path: ./kf_to_c2m2_etl/conversion_tables/cfde_reference_tables
   kf_to_c2m2_mappings_path: ./kf_to_c2m2_etl/conversion_tables/kf_to_c2m2_mappings

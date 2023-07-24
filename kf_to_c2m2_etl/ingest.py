@@ -58,7 +58,7 @@ class Ingest:
             result_iterator = pd.read_sql(query, con, chunksize=chunk_size)
             for chunk in tqdm(result_iterator, total=table_size/chunk_size):
                 postfix = table_name.split('.')[-1]
-                PandasCsvUpdater(postfix,chunk).update_csv_with_df()
+                PandasCsvUpdater(table_name=postfix,the_df=chunk).update_csv_with_df()
 
             timer.stop()
 
