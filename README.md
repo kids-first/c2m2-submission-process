@@ -44,16 +44,16 @@ source setup_evn.sh
 ```
 
 3. Execute kf to c2m2 etl process
-- This is currently under construction
-- For now, ingesting source data is manual
-  * Execute sql located at /kf_to_c2m2_etl/ingested/sql
-  * Export data sets from sql to /data_ingestion/ingested
 - Execute transform script
+  - The script executes in 3 phases
+    1. Extract (Ingest class utilizing kf-utils writes kf model data in the form of tsv to the /kf_to_c2m2_etl/ingested/tables directory.)
+    2. Transform (KF model data mapping to tables is transformed into c2m2 tables and written back out as tsv's to /kf_to_c2m2_etl/transformed.)
+    3. Load (Moves transformed tsv's into directory in order to execute script contributing controlled vocabularies.)
+     - Also, adds empty tables required for submission
+
 ```bash
-python /data_ingestion/transform.py
+python /kf_to_c2m2_etl/etl.py
 ```
-- Move tsv's from transform to draft submission directory
-- Also, add empty tables required for submission
 
 4. Execute osf script for preparing c2m2 submission 
  - Executes prepare submission script 
