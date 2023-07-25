@@ -47,12 +47,12 @@ source setup_evn.sh
 - Execute transform script
   - The script executes in 3 phases
     1. Extract 
-     - Ingest class utilizing kf-utils writes kf model data in the form of tsv to the /kf_to_c2m2_etl/ingested/tables directory.
+      * Ingest class utilizing kf-utils writes kf model data in the form of tsv to the /kf_to_c2m2_etl/ingested/tables directory.
     2. Transform 
-     - KF model data mapping to tables is transformed into c2m2 tables and written back out as tsv's to /kf_to_c2m2_etl/transformed.
+      * KF model data mapping to tables is transformed into c2m2 tables and written back out as tsv's to /kf_to_c2m2_etl/transformed.
     3. Load 
-     - Moves transformed tsv's into directory in order to execute script contributing controlled vocabularies.
-     - Also, adds empty tables required for submission
+      * Moves transformed tsv's into directory in order to execute script contributing controlled vocabularies.
+      * Also, adds empty tables required for submission
 
 ```bash
 python /kf_to_c2m2_etl/etl.py
