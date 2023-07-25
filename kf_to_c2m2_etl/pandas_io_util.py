@@ -3,8 +3,7 @@ from glob import glob
 
 import pandas as pd
 
-ingest_dir = os.path.join(os.getcwd(),'kf_to_c2m2_etl','ingest_test')
-
+from file_locations import file_locations
 
 class PandasCsvUpdater:
 
@@ -13,7 +12,7 @@ class PandasCsvUpdater:
         self.the_df = the_df
 
     def update_csv_with_df(self) -> None:
-        file_path = os.path.join(ingest_dir,f'{self.table_name}.csv')
+        file_path = os.path.join(file_locations.get_ingested_path(),f'{self.table_name}.csv')
 
         self.the_df.to_csv(file_path,
                            mode='a+',
@@ -40,7 +39,7 @@ def delete_selected_csv(csv_s: list):
 execute_user_option = {'all': delete_all_csvs, 'spec': delete_selected_csv}
 
 def handle_pre_existing_files():
-    if csv_s := glob(os.path.join(ingest_dir,'*.csv')):
+    if csv_s := glob(os.path.join(file_locations.get_ingested_path(),'*.csv')):
         print('The ingest directory isn\'t empty.')
 
         user_opt = input('Delete all or specified: ')
