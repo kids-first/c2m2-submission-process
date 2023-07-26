@@ -14,7 +14,6 @@ click==7.1.1
 colorama==0.4.6
 commonmark==0.9.1
 cryptography==39.0.0
-d3b-utils==0.6.0.post2
 decorator==5.1.1
 fair-research-login==0.2.6
 frictionless==4.16.2
@@ -30,7 +29,7 @@ isodate==0.6.1
 Jinja2==3.1.2
 jmespath==1.0.1
 jsonschema==3.2.0
-kf-utils==0.4.1
+kf-utils @ git+https://github.com/kids-first/kf-utils-python.git
 marko==1.2.2
 MarkupSafe==2.1.1
 modgrammar==0.10
