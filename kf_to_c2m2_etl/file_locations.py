@@ -43,6 +43,9 @@ class FileLocations:
     def get_c2m2_table_provider_path(self):
         return self.config['paths']['c2m2_table_provider_path']
 
+    def get_fhir_mapping_paths(self):
+        return self.config['paths']['fhir_mapping_path']
+
     def get_auto_gen_path(self):
         return self.config['paths']['auto_gen_path']
 

@@ -4,6 +4,7 @@ paths:
   transformed_path: ./kf_to_c2m2_etl/transformed
   cfde_ref_table_path: ./kf_to_c2m2_etl/conversion_tables/cfde_reference_tables
   kf_to_c2m2_mappings_path: ./kf_to_c2m2_etl/conversion_tables/kf_to_c2m2_mappings
+  fhir_mapping_path: ./kf_to_c2m2_etl/conversion_tables/fhir
   ontology_mappings_path: ./kf_to_c2m2_etl/conversion_tables/ontology_mappings
   conversion_path: ./kf_to_c2m2_etl/conversion_tables
   c2m2_data_package_json_path: C2M2_datapackage.json
