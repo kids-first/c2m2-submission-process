@@ -1,4 +1,6 @@
 import os
+from collections import defaultdict 
+
 import pandas as pd
 from typing import List
 
@@ -23,7 +25,7 @@ pirate = Pirate(
         num_processes=1
     )
 
-fhir_entity_mapping = {"participant":"Patient"}
+fhir_resource_mapping = {"participants":"Patient"}
 
 def get_fhir_mapping(entity_name: str) -> List[tuple]:
     mapping_path = os.path.join(file_locations.get_fhir_mapping_paths(),f'{entity_name}_mapping.tsv')
@@ -31,19 +33,23 @@ def get_fhir_mapping(entity_name: str) -> List[tuple]:
     return mapping_df.to_records(index=False).tolist()
 
 class FhirIngest:
-    study_descendants = ["participant"]
+    study_descendants = ["participants"]
 
     def __init__(self,studies_to_ingest):
-        self.studies = pd.DataFrame({"studies":studies_to_ingest})
+        self.studies = pd.DataFrame({ "studies": studies_to_ingest })
 
 
-    def extract(self) -> pd.DataFrame:
-        patient_df = pirate.trade_rows_for_dataframe(
-            self.studies,
-            resource_type="Patient",
-            df_constraints={"_tag":"studies"},
-            fhir_paths=get_fhir_mapping('participant')
-        )
-        return patient_df
+    def extract(self) -> defaultdict:
+        df_dict = defaultdict()
+        
+        for kf_entity in FhirIngest.study_descendants:
+            the_df = pirate.trade_rows_for_dataframe(
+                self.studies,
+                resource_type=fhir_resource_mapping[kf_entity],
+                df_constraints={"_tag":"studies"},
+                fhir_paths=get_fhir_mapping(kf_entity)
+            )
 
-print(FhirIngest(['SD_DYPMEHHF']).extract())
+            df_dict.setdefault(kf_entity,the_df)
+
+        return {','.join(self.studies['studies'].to_list()): df_dict}

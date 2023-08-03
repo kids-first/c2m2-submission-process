@@ -4,22 +4,26 @@ import shutil
 
 from pandas_io_util import handle_pre_existing_files
 
-from ingest import Ingest, write_studies_to_disk
+from ingest import Ingest, write_studies_to_disk, IngestType
+from fhir_ingest import FhirIngest
 from transform import transform_kf_to_c2m2_on_disk
 from loader import TsvLoader
 from file_locations import file_locations
 
 portal_studies_path = os.path.join(file_locations.get_etl_path(),'studies_on_portal.tsv')
+kf_studies_on_fhir = ['SD_JWS3V24D','SD_FFVQ3T38','SD_DYPMEHHF']
 
 def main():
 
-    studies = pd.read_table(portal_studies_path)['studies_on_portal'].to_list()
+    # studies = pd.read_table(portal_studies_path)['studies_on_portal'].to_list()
 
-    ingestor = Ingest(studies)
+    dataservice_ingestor = Ingest(kf_studies_on_fhir)
 
-    ingestor.get_file_metadata()
+    dataservice_ingestor.get_file_metadata()
 
-    write_studies_to_disk(ingestor.extract())
+    write_studies_to_disk(IngestType.DS, dataservice_ingestor.extract())
+
+    write_studies_to_disk(IngestType.FHIR, FhirIngest(kf_studies_on_fhir).extract())
 
     transform_kf_to_c2m2_on_disk()
 
