@@ -10,6 +10,7 @@ subject	project_id_namespace	kidsfirst:
 subject	persistent_id	
 subject	granularity	cfde_subject_granularity:0
 subject	age_at_enrollment	
+subject	creation_time	
 biosample	id_namespace	kidsfirst:
 biosample	project_id_namespace	kidsfirst:
 biosample	persistent_id	
