@@ -44,7 +44,7 @@ def get_column_mapping(target_col: str):
     Returns:
         dict: A dictionary containing the column mappings.
     """
-    column_mapping_df = pd.read_table(column_mapping_path)
+    column_mapping_df = pd.read_table(column_mapping_path,comment='#')
     result_df = column_mapping_df.query('kf_col == @target_col')
     return result_df.to_dict('records')[0]
 
