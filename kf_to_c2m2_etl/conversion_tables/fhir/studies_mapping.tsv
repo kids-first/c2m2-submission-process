@@ -1,0 +1,5 @@
+KF Field	FHIR Field
+kf_id	meta.tag[0].code
+program	keyword[0].text
+name	title
+short_name	keyword[1].coding[0].code

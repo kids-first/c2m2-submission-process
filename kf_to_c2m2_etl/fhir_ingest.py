@@ -25,6 +25,8 @@ pirate = Pirate(
         num_processes=1
     )
 
+include_studies_to_exclude = ['SD_T8VSYRSG','SD_FYCR78W0','SD_Y6VRG6MD','SD_65064P2Z']
+
 fhir_resource_mapping = {"participants":"Patient"}
 
 def get_fhir_mapping(entity_name: str) -> List[tuple]:
@@ -35,8 +37,9 @@ def get_fhir_mapping(entity_name: str) -> List[tuple]:
 class FhirIngest:
     study_descendants = ["participants"]
 
-    def __init__(self,studies_to_ingest):
-        self.studies = pd.DataFrame({ "studies": studies_to_ingest })
+    def __init__(self):
+        self.studies_df = FhirIngest.get_studies() 
+        self.studies = pd.DataFrame({'studies': self.studies_df['kf_id'].to_list()})
 
 
     def extract(self) -> defaultdict:
@@ -52,4 +55,14 @@ class FhirIngest:
 
             df_dict.setdefault(kf_entity,the_df)
 
+        df_dict.setdefault('studies',self.studies_df)
+
         return {','.join(self.studies['studies'].to_list()): df_dict}
+
+    def get_studies():
+        studies_df = pirate.steal_bundles_to_dataframe(
+                resource_type='ResearchStudy',
+                fhir_paths=get_fhir_mapping('studies')
+        )
+        studies_df = studies_df[~studies_df['kf_id'].isin(include_studies_to_exclude)]
+        return studies_df
