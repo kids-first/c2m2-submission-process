@@ -27,15 +27,21 @@ pirate = Pirate(
 
 include_studies_to_exclude = ['SD_T8VSYRSG','SD_FYCR78W0','SD_Y6VRG6MD','SD_65064P2Z']
 
-fhir_resource_mapping = {"participants":"Patient"}
+fhir_resource_mapping = {"participants":"Patient",
+                         "genomic-files":"DocumentReference"}
 
 def get_fhir_mapping(entity_name: str) -> List[tuple]:
     mapping_path = os.path.join(file_locations.get_fhir_mapping_paths(),f'{entity_name}_mapping.tsv')
     mapping_df = pd.read_table(mapping_path)
     return mapping_df.to_records(index=False).tolist()
 
+
+def convert_drs_uri_to_did(the_df : pd.DataFrame):
+    the_df['latest_did'] = the_df['latest_did'].apply(lambda the_col: the_col.split('/')[-1])
+    return the_df
+
 class FhirIngest:
-    study_descendants = ["participants"]
+    study_descendants = ["participants","genomic-files"]
 
     def __init__(self):
         self.studies_df = FhirIngest.get_studies() 
@@ -52,6 +58,9 @@ class FhirIngest:
                 df_constraints={"_tag":"studies"},
                 fhir_paths=get_fhir_mapping(kf_entity)
             )
+
+            if kf_entity == "genomic-files":
+                the_df = convert_drs_uri_to_did(the_df)
 
             df_dict.setdefault(kf_entity,the_df)
 
