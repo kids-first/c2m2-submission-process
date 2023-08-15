@@ -9,7 +9,7 @@ subject	project_local_id	participant	PT_study_id
 subject	sex	participant	PT_gender
 subject	ethnicity	participant	PT_ethnicity
 biosample	local_id	biospecimen	BS_kf_id
-biosample	creation_time	biospecimen	BS_created_at
+# biosample	creation_time	biospecimen	BS_created_at
 biosample	anatomy	biospecimen	BS_uberon_id_anatomical_site
 biosample	project_local_id	participant	PT_study_id
 biosample_from_subject	biosample_local_id	biospecimen	BS_kf_id
