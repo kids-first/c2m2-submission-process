@@ -146,11 +146,11 @@ class IngestType(Enum):
     FHIR = 1
     DS = 2
 
-ds_targets = ['diagnoses','studies',
+ds_targets = ['diagnoses',
              'biospecimens','biospecimen-diagnoses',
              'genomic-files','biospecimen-genomic-files']
 
-fhir_targets = ['participants']
+fhir_targets = ['studies','participants']
 
 ingest_targets = {IngestType.DS: ds_targets, IngestType.FHIR: fhir_targets}
 

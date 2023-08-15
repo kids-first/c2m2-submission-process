@@ -17,13 +17,16 @@ def main():
 
     # studies = pd.read_table(portal_studies_path)['studies_on_portal'].to_list()
 
-    dataservice_ingestor = Ingest(kf_studies_on_fhir)
+
+    fhir_ingestor = FhirIngest()
+
+    dataservice_ingestor = Ingest(fhir_ingestor.studies['studies'].to_list())
 
     dataservice_ingestor.get_file_metadata()
 
     write_studies_to_disk(IngestType.DS, dataservice_ingestor.extract())
 
-    write_studies_to_disk(IngestType.FHIR, FhirIngest(kf_studies_on_fhir).extract())
+    write_studies_to_disk(IngestType.FHIR, fhir_ingestor.extract())
 
     transform_kf_to_c2m2_on_disk()
 
