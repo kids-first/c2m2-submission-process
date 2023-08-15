@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from table_ops import TableJoiner
+from table_ops import TableJoiner, is_column_present
 from file_locations import file_locations
 
 
@@ -74,7 +74,7 @@ class KfTableCombiner:
                 file_path = os.path.join(file_locations.get_ingested_path(),f'{table_to_endpoint_name[table_name]}.csv')
 
                 if table_name in kf_tablenames:
-                    if table_name in kf_tables_with_visibility:
+                    if table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
                         table_df = pd.read_csv(file_path, low_memory=False).query('visible == True')
                     else:
                         table_df = pd.read_csv(file_path, low_memory=False)

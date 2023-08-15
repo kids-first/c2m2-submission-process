@@ -5,7 +5,7 @@ project	name	study	SD_short_name
 project	description	study	SD_name
 subject	local_id	participant	PT_kf_id
 subject	project_local_id	participant	PT_study_id
-subject	creation_time	participant	PT_created_at
+# subject	creation_time	participant	PT_created_at
 subject	sex	participant	PT_gender
 subject	ethnicity	participant	PT_ethnicity
 biosample	local_id	biospecimen	BS_kf_id

@@ -134,3 +134,12 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     the_df = the_df[get_table_cols_from_c2m2_json(entity_name)]
 
     return the_df
+
+def is_column_present(file_path, column_name):
+    try:
+        # Read only the first row (header) of the CSV file
+        header = pd.read_csv(file_path, nrows=1).columns.tolist()
+        return column_name in header
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return False

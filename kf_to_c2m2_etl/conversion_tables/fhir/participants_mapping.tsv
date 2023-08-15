@@ -1,0 +1,5 @@
+KF Field	FHIR Field
+kf_id	identifier[0].value
+study_id	meta.tag[0].code
+gender	gender
+ethnicity	extension[1].extension[0].valueString

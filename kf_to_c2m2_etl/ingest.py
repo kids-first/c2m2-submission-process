@@ -1,5 +1,6 @@
 import logging, os
 from collections import defaultdict
+from enum import Enum
 
 from dotenv import find_dotenv, load_dotenv
 from sqlalchemy import create_engine
@@ -141,13 +142,22 @@ class Ingest:
 
         return mapped_df_dict
 
-targets = ['participants','diagnoses','studies',
+class IngestType(Enum):
+    FHIR = 1
+    DS = 2
+
+ds_targets = ['diagnoses','studies',
              'biospecimens','biospecimen-diagnoses',
              'genomic-files','biospecimen-genomic-files']
 
-def write_studies_to_disk(studies_dict: dict):
+fhir_targets = ['participants']
+
+ingest_targets = {IngestType.DS: ds_targets, IngestType.FHIR: fhir_targets}
+
+
+def write_studies_to_disk(ingest_type: IngestType, studies_dict: dict):
     for index, (study, endpoints) in enumerate(studies_dict.items()):
         for endpoint, the_df in endpoints.items():
-            if isinstance(the_df,pd.DataFrame) and endpoint in targets:
+            if isinstance(the_df,pd.DataFrame) and endpoint in ingest_targets[ingest_type]:
                 the_df.sort_values(by=['kf_id'],inplace=True)
                 PandasCsvUpdater(endpoint,the_df).update_csv_with_df()
