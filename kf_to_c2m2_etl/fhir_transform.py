@@ -30,6 +30,13 @@ def transform_fhir_to_c2m2_on_disk():
                                c2m2_entity_name = 'biosample_from_subject',
                                sort_on='biosample_local_id',
                                ascending_sort=False)
+
+
+    convert_fhir_to_subject_disease(fhir_combined_list = ['Patient'],
+                               c2m2_entity_name = 'subject_disease',
+                               sort_on='subject_local_id',
+                               ascending_sort=False)
+    
 def convert_fhir_to_c2m2(func):
     def wrapper(**kwargs):
         fhir_combined_df = FhirDataJoiner(kwargs['fhir_combined_list']).join_resources()
@@ -76,4 +83,13 @@ def convert_fhir_to_biosample_from_subject(the_df: pd.DataFrame):
         the_df[age_at_even_days_col_name] = the_df[age_at_even_days_col_name].apply(convert_days_to_years)
     else:
         the_df[age_at_even_days_col_name] = None
+    return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
+    project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+    the_df = the_df.merge(project_disease_df,
+                          how='inner',
+                          left_on='meta_tag_0_code',
+                          right_on='study_id')
     return the_df
