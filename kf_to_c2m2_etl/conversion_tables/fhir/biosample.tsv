@@ -1,0 +1,4 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+Specimen	identifier_0_value	biosample	local_id
+Specimen	meta_tag_0_code	biosample	project_local_id
+Specimen	collection_bodySite_text	biosample	anatomy

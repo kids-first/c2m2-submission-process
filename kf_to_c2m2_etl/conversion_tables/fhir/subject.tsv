@@ -1,0 +1,5 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+Patient	identifier_0_value	subject	local_id
+Patient	meta_tag_0_code	subject	project_local_id
+Patient	gender	subject	sex
+Patient	extension_1_extension_0_valueString	subject	ethnicity

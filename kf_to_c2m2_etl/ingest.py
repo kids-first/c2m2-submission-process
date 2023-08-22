@@ -1,6 +1,5 @@
 import logging, os
 from collections import defaultdict
-from enum import Enum
 
 from dotenv import find_dotenv, load_dotenv
 from sqlalchemy import create_engine
@@ -10,7 +9,7 @@ import pandas as pd
 from kf_utils.dataservice.descendants import find_descendants_by_kfids 
 from pandas_io_util import PandasCsvUpdater
 from time_keeper import Timer
-
+from etl_types import ETLType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -142,25 +141,19 @@ class Ingest:
 
         return mapped_df_dict
 
-class IngestType(Enum):
-    FHIR = 1
-    DS = 2
 
-ds_targets = ['diagnoses',
-             'biospecimen-diagnoses',
-             'biospecimen-genomic-files',
-             'genomic-files']
-
-fhir_targets = ['studies',
-                'participants',
-                'biospecimens']
-
-ingest_targets = {IngestType.DS: ds_targets, IngestType.FHIR: fhir_targets}
+endpoint_targets = ['studies',
+                    'participants',
+                    'biospecimens',
+                    'diagnoses',
+                    'biospecimen-diagnoses',
+                    'biospecimen-genomic-files',
+                    'genomic-files']
 
 
-def write_studies_to_disk(ingest_type: IngestType, studies_dict: dict):
+def write_studies_to_disk(studies_dict: dict):
     for index, (study, endpoints) in enumerate(studies_dict.items()):
         for endpoint, the_df in endpoints.items():
-            if isinstance(the_df,pd.DataFrame) and endpoint in ingest_targets[ingest_type]:
+            if isinstance(the_df,pd.DataFrame) and endpoint in endpoint_targets:
                 the_df.sort_values(by=['kf_id'],inplace=True)
                 PandasCsvUpdater(endpoint,the_df).update_csv_with_df()

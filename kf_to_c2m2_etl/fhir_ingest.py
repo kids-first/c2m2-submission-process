@@ -9,6 +9,7 @@ from fhir_pyrate import Ahoy, Pirate
 
 from file_locations import file_locations
 from associations import AssociationBuilder
+from pandas_io_util import PandasCsvUpdater
 
 
 PROD_URL = 'https://kf-api-fhir-service.kidsfirstdrc.org/'
@@ -45,6 +46,7 @@ def convert_drs_uri_to_did(the_df : pd.DataFrame):
 
 class FhirIngest:
     study_descendants = ["participants","biospecimens"]
+    fhir_resources = ['Patient','Specimen','DocumentReference']
 
     def __init__(self, selected_studies = None):
 
@@ -57,7 +59,8 @@ class FhirIngest:
 
             self.studies_df = self.studies_df.merge(selected_studies_df,
                                                     how='inner',
-                                                    on='kf_id')
+                                                    left_on='identifier_0_value',
+                                                    right_on='kf_id')
 
         self.studies = pd.DataFrame({'studies': self.studies_df['kf_id'].to_list()})
 
@@ -65,32 +68,36 @@ class FhirIngest:
     def extract(self) -> defaultdict:
         df_dict = defaultdict()
         
-        for kf_entity in FhirIngest.study_descendants:
+        for fhir_resource in FhirIngest.fhir_resources:
             the_df = pirate.trade_rows_for_dataframe(
                 self.studies,
-                resource_type=fhir_resource_mapping[kf_entity],
+                resource_type=fhir_resource,
                 df_constraints={"_tag":"studies"},
-                fhir_paths=get_fhir_mapping(kf_entity)
+                # fhir_paths=get_fhir_mapping(kf_entity)
             )
 
-            if kf_entity == "genomic-files":
-                the_df = convert_drs_uri_to_did(the_df)
+            df_dict.setdefault(fhir_resource,the_df)
 
-            df_dict.setdefault(kf_entity,the_df)
+        df_dict.setdefault('ResearchStudy',self.studies_df)
 
-        df_dict.setdefault('studies',self.studies_df)
-
-        df_dict = build_relationships(df_dict)
+        # df_dict = build_relationships(df_dict)
 
         return {','.join(self.studies['studies'].to_list()): df_dict}
 
     def _get_studies():
         studies_df = pirate.steal_bundles_to_dataframe(
                 resource_type='ResearchStudy',
-                fhir_paths=get_fhir_mapping('studies')
+                # fhir_paths=get_fhir_mapping('studies')
         )
-        studies_df = studies_df[~studies_df['kf_id'].isin(include_studies_to_exclude)]
+        studies_df = studies_df[~studies_df['identifier_0_value'].isin(include_studies_to_exclude)]
         return studies_df
+
+
+def write_fhir_studies_to_disk(studies_dict: dict):
+    for index, (study, endpoints) in enumerate(studies_dict.items()):
+        for endpoint, the_df in endpoints.items():
+            if isinstance(the_df,pd.DataFrame):
+                PandasCsvUpdater(endpoint,the_df).update_csv_with_df()
 
 
 def build_relationships(df_dict):

@@ -1,0 +1,5 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+ResearchStudy	identifier_0_value	project	local_id
+ResearchStudy	keyword_1_coding_0_code	project	abbreviation
+ResearchStudy	keyword_1_coding_0_code	project	name
+ResearchStudy	title	project	description

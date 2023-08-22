@@ -1,0 +1,12 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+
+identifier.value	file_id
+type	file_type
+content.format	file_format
+content.size	file_size
+content.attachment.hash	checksum
+content.attachment.url	file_path
+subject.reference	subject_id
+context.related.identifier	biosample_id
+context.encounter.period.start	collection_date
+context.related.identifier (custom extension)	source_subject_id
