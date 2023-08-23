@@ -1,0 +1,3 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+Specimen	identifier_0_value	biosample_disease	biosample_local_id
+project_disease_matrix_only	DOID	biosample_disease	disease

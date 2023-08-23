@@ -31,7 +31,7 @@ def main():
         transform_kf_to_c2m2_on_disk()
 
     elif ingest_type == ETLType.FHIR:
-        fhir_ingestor = FhirIngest(['SD_RM8AFW0R','SD_PREASA7S'])
+        fhir_ingestor = FhirIngest(['SD_65064P2Z','SD_DYPMEHHF','SD_FYCR78W0','SD_Z6MWD3H0'])
 
         write_fhir_studies_to_disk(fhir_ingestor.extract())
 

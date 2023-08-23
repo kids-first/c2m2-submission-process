@@ -12,9 +12,9 @@ fhir_resource_types = ['ResearchStudy','Patient','Specimen','DocumentReference']
 class FhirDataJoiner:
     foreign_key_mappings = {
         'Patient': {'Specimen': {'left': 'Patient_id', 'right': 'Specimen_subject_reference'},
-                    'DocumentReference': {'left': 'patient_id', 'right': 'subject_reference'}},
-        'Specimen': {'Patient': {'left': 'subject_reference', 'right': 'patient_id'},
-                     'DocumentReference': {'left': 'specimen_id', 'right': 'subject_reference'}},
+                    'DocumentReference': {'left': 'Patient_id', 'right': 'DocumentReference_subject_reference'}},
+        'Specimen': {'Patient': {'left': 'Specimen_subject_reference', 'right': 'Patient_id'},
+                     'DocumentReference': {'left': 'Specimen_id', 'right': 'DocumentReference_context_related_0_reference'}},
         'DocumentReference': {'Patient': {'left': 'subject_reference', 'right': 'patient_id'},
                               'Specimen': {'left': 'subject_reference', 'right': 'specimen_id'}}
     }
@@ -46,7 +46,7 @@ class FhirDataJoiner:
                 right_key = mapping['right']
                 joined_df = add_resource_prefix(joined_df)
                 df = add_resource_prefix(df)
-                df[right_key] = df[right_key].apply(lambda col: col.split('/')[-1]).astype(int)
+                df[right_key] = df[right_key].apply(strip_id_from_association)
                 joined_df = pd.merge(joined_df, df, left_on=left_key, right_on=right_key, how='inner')
             else:
                 raise ValueError(f"No mapping found for joining {self.resource_list[i - 1]} and {resource_name}")
@@ -73,6 +73,11 @@ def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
 
     return the_df
 
+def strip_id_from_association(the_col):
+    if pd.isna(the_col):
+        return None
+    else:
+        return int(the_col.split('/')[-1])
 
 def load_resources(resource_list: list):
     fhir_resource_dataframe_dict = {}

@@ -31,12 +31,27 @@ def transform_fhir_to_c2m2_on_disk():
                                sort_on='biosample_local_id',
                                ascending_sort=False)
 
-
     convert_fhir_to_subject_disease(fhir_combined_list = ['Patient'],
                                c2m2_entity_name = 'subject_disease',
                                sort_on='subject_local_id',
                                ascending_sort=False)
-    
+
+    convert_fhir_to_biosample_disease(fhir_combined_list=['Specimen'],
+                                    c2m2_entity_name='biosample_disease',
+                                    sort_on='biosample_local_id',
+                                    ascending_sort=True)
+
+    convert_fhir_to_subject_role_taxonomy(fhir_combined_list=['Patient'],
+                                        c2m2_entity_name='subject_role_taxonomy',
+                                        sort_on='subject_local_id',
+                                        ascending_sort=True)
+
+    convert_fhir_to_file(fhir_combined_list=['Specimen','DocumentReference'],
+                         c2m2_entity_name='file',
+                         sort_on='local_id',
+                         ascending_sort=True)
+
+
 def convert_fhir_to_c2m2(func):
     def wrapper(**kwargs):
         fhir_combined_df = FhirDataJoiner(kwargs['fhir_combined_list']).join_resources()
@@ -92,4 +107,21 @@ def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
                           how='inner',
                           left_on='meta_tag_0_code',
                           right_on='study_id')
+    return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_biosample_disease(the_df: pd.DataFrame):
+    project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+    the_df = the_df.merge(project_disease_df,
+                          how='inner',
+                          left_on='meta_tag_0_code',
+                          right_on='study_id')
+    return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_subject_role_taxonomy(the_df: pd.DataFrame):
+    return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_file(the_df: pd.DataFrame):
     return the_df
