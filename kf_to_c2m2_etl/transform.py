@@ -3,10 +3,14 @@ import pandas as pd
 from typing import List
 import logging 
 
-from cfde_convert import kf_to_cfde_value_converter, uberon_mapping_dict
+from cfde_convert import kf_to_cfde_value_converter
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
 from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
+
+from value_converter import modify_dbgap, get_persistent_id, \
+                            path_to_filename, convert_days_to_years, \
+                            apply_uberon_mapping
 
 logging.basicConfig(level=logging.INFO)
 
@@ -98,13 +102,6 @@ def convert_kf_to_subject(kf_parts: pd.DataFrame):
     return subject_df
 
 
-def apply_uberon_mapping(source_text, uberon_id):
-    if isinstance(uberon_id,str) and uberon_id.lower().startswith('uberon'):
-        return uberon_id
-    elif isinstance(source_text,str):
-        for anatomy_term, id in uberon_mapping_dict.items():
-            if anatomy_term in source_text.lower():
-                return id.upper()
 
 #requires additional work for anatomy
 @convert_kf_to_c2m2
@@ -116,10 +113,6 @@ def convert_kf_to_biosample(kf_combined_df):
                                                                     axis=1)
     return kf_combined_df
 
-
-def convert_days_to_years(days):
-    if days:
-        return f"{(days / 365):.02f}"
 
 @convert_kf_to_c2m2
 def convert_kf_to_biosample_from_subject(kf_combined_df):
@@ -147,22 +140,6 @@ def convert_kf_to_subject_role_taxonomy(kf_combined_df):
     logging.info('Converting kf to c2m2 subject role taxomonmy')
     return kf_combined_df
 
-
-def modify_dbgap(study_id):
-    if study_id and isinstance(study_id, str):
-        if study_id.startswith('phs'):
-            return study_id.split('.')[0]
-        else:
-            return ''
-
-def get_persistent_id(study, did, md5):
-    if isinstance(study,str) and isinstance(did,str) and pd.notnull(md5):
-        if study not in ['SD_BHJXBDQK','SD_8Y99QZJJ','SD_46RR9ZR6','SD_YNSSAPHE']:
-            return 'drs://data.kidsfirstdrc.org/' + did
-
-def path_to_filename(path):
-    if isinstance(path,str):
-        return path.split('/')[-1]
 
 @convert_kf_to_c2m2
 def convert_kf_to_file(kf_genomic_files):

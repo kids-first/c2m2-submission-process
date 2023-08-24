@@ -6,6 +6,9 @@ from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
 from cfde_convert import kf_to_cfde_value_converter
 from file_locations import file_locations
 from etl_types import ETLType
+from value_converter import convert_days_to_years, modify_dbgap, \
+                            apply_uberon_mapping
+
 
 def transform_fhir_to_c2m2_on_disk():
     convert_fhir_to_project_in_project(fhir_combined_list= ['ResearchStudy'],
@@ -91,11 +94,10 @@ def convert_fhir_to_subject(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_biosample(the_df: pd.DataFrame):
+    the_df['collection_bodySite_text'] = the_df.apply(lambda the_df: 
+                                                          apply_uberon_mapping(ETLType.FHIR,the_df['collection_bodySite_text']),
+                                                          axis=1)
     return the_df
-
-def convert_days_to_years(days):
-    if days:
-        return f"{(days / 365):.02f}"
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_biosample_from_subject(the_df: pd.DataFrame):
@@ -133,6 +135,9 @@ def convert_fhir_to_subject_role_taxonomy(the_df: pd.DataFrame):
 def convert_fhir_to_file(the_df: pd.DataFrame):
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_content_0_format_display')
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_type_coding_0_code')
+
+    the_df['Specimen_meta_security_1_code'] = the_df['Specimen_meta_security_1_code'].apply(modify_dbgap)
+
     return the_df
 
 @convert_fhir_to_c2m2
