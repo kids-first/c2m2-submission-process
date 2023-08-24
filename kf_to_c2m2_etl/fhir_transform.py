@@ -3,7 +3,9 @@ import os
 import pandas as pd
 
 from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
+from cfde_convert import kf_to_cfde_value_converter
 from file_locations import file_locations
+from etl_types import ETLType
 
 def transform_fhir_to_c2m2_on_disk():
     convert_fhir_to_project_in_project(fhir_combined_list= ['ResearchStudy'],
@@ -50,6 +52,11 @@ def transform_fhir_to_c2m2_on_disk():
                          c2m2_entity_name='file',
                          sort_on='local_id',
                          ascending_sort=True)
+
+    convert_fhir_to_file_describes_biosample(fhir_combined_list=['Specimen','DocumentReference'],
+                                          c2m2_entity_name='file_describes_biosample',
+                                          sort_on=['biosample_local_id','file_local_id'],
+                                          ascending_sort=True)
 
 
 def convert_fhir_to_c2m2(func):
@@ -124,4 +131,13 @@ def convert_fhir_to_subject_role_taxonomy(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_file(the_df: pd.DataFrame):
+    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_content_0_format_display')
+    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_type_coding_0_code')
     return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_file_describes_biosample(the_df: pd.DataFrame):
+    return the_df
+
+if __name__ == "__main__":
+    transform_fhir_to_c2m2_on_disk()

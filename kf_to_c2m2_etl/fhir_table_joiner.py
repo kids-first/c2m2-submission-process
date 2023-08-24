@@ -98,3 +98,16 @@ def add_resource_prefix(the_df: pd.DataFrame):
         the_df = the_df.add_prefix(f'{resource}_')
 
     return the_df 
+
+def get_fhir_table_for_column(target_col: str):
+    try:
+        # Iterate over TSV files in the directory
+        for filename in os.listdir(file_locations.get_fhir_mapping_paths()):
+            if filename.endswith(".tsv"):
+                file_path = os.path.join(file_locations.get_fhir_mapping_paths(), filename)
+                df = pd.read_csv(file_path,sep='\t')
+                if target_col in df['FHIR Field'].values:
+                    return df 
+    except Exception as e:
+        print(f"Error processing {file_path}: {e}")
+        return None

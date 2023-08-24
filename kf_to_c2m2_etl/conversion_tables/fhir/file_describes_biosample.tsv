@@ -1,0 +1,3 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+DocumentReference	DocumentReference_identifier_0_value	file_describes_biosample	file_local_id
+Specimen	Specimen_identifier_0_value	file_describes_biosample	biosample_local_id
