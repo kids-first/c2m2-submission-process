@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+import numpy as np
 
 from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
 from cfde_convert import kf_to_cfde_value_converter
@@ -85,11 +86,13 @@ def convert_fhir_to_project_in_project(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_project(the_df: pd.DataFrame):
-    the_df['abbreviation'] = the_df['keyword_1_coding_0_code']
+    the_df['abbreviation'] = the_df['identifier_0_value']
     return the_df
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_subject(the_df: pd.DataFrame):
+    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'gender')
+    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'extension_1_extension_0_valueString')
     return the_df
 
 @convert_fhir_to_c2m2
@@ -131,12 +134,27 @@ def convert_fhir_to_biosample_disease(the_df: pd.DataFrame):
 def convert_fhir_to_subject_role_taxonomy(the_df: pd.DataFrame):
     return the_df
 
+def update_hash(row):
+    if row['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_coding_0_display'] == 'etag':
+        return np.nan
+    else:
+        return row['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_text']
+
+def update_persistent_id(row):
+    if row['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_coding_0_display'] == 'etag':
+        return np.nan
+    else:
+        return row['DocumentReference_content_0_attachment_url']
+
 @convert_fhir_to_c2m2
 def convert_fhir_to_file(the_df: pd.DataFrame):
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_content_0_format_display')
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_type_coding_0_code')
 
     the_df['Specimen_meta_security_1_code'] = the_df['Specimen_meta_security_1_code'].apply(modify_dbgap)
+
+    the_df['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_text'] = the_df.apply(update_hash,axis=1)
+    the_df['DocumentReference_content_0_attachment_url'] = the_df.apply(update_persistent_id,axis=1)
 
     return the_df
 
