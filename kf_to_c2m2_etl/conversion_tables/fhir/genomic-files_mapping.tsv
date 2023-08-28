@@ -1,6 +1,0 @@
-KF Field	FHIR Field
-kf_id	identifier[0].value
-external_id	content[1].attachment.url
-file_format	content[0].format.display
-data_type	type.coding[0].code
-latest_did	content[0].attachment.url

@@ -1,0 +1,3 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+Patient	identifier_0_value	subject_disease	subject_local_id
+project_disease_matrix_only	DOID	subject_disease	disease

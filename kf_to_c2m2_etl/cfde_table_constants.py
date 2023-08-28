@@ -3,6 +3,7 @@ import pandas as pd
 import json
 
 from file_locations import file_locations
+from etl_types import ETLType
 
 
 
@@ -27,7 +28,7 @@ def get_table_cols_from_c2m2_json(table_name):
     return table_fields 
 
 
-def get_column_mappings(c2m2_entity_name: str):
+def get_column_mappings(ingest_type: ETLType, c2m2_entity_name: str):
     """
     Get a dictionary of column mappings from KF to C2M2 for the specified entity.
 
@@ -37,10 +38,18 @@ def get_column_mappings(c2m2_entity_name: str):
     Returns:
         dict: A dictionary of column mappings from KF to C2M2 for the specified entity.
     """
-    mapping_path = os.path.join(file_locations.get_kf_to_c2m2_mappings_path(),'column_mapping.tsv')
-    column_mapping_df = pd.read_table(mapping_path)
-    column_mapping_df.query(f'c2m2_entity == "{c2m2_entity_name}"',inplace=True)
-    mapping_dict = dict(zip(column_mapping_df.kf_col,column_mapping_df.c2m2_col))
+    if ingest_type == ETLType.DS:
+        mapping_path = os.path.join(file_locations.get_kf_to_c2m2_mappings_path(),'column_mapping.tsv')
+        column_mapping_df = pd.read_table(mapping_path)
+        column_mapping_df.query(f'c2m2_entity == "{c2m2_entity_name}"',inplace=True)
+        mapping_dict = dict(zip(column_mapping_df.kf_col,column_mapping_df.c2m2_col))
+
+    elif ingest_type == ETLType.FHIR:
+        mapping_path = os.path.join(file_locations.get_fhir_mapping_paths(),f'{c2m2_entity_name}.tsv')
+        column_mapping_df = pd.read_table(mapping_path)
+        column_mapping_df.query(f'`C2M2 Entity` == "{c2m2_entity_name}"',inplace=True)
+        mapping_dict = dict(zip(column_mapping_df['FHIR Field'], column_mapping_df['C2M2 Field']))
+
     return mapping_dict
 
 def get_hard_coded_columns(c2m2_entity_name: str):

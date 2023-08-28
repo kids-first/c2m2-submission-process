@@ -1,8 +1,0 @@
-KF Field	FHIR Field
-study_id	meta.tag[0].code
-kf_id	identifier[0].value
-source_text_anatomical_site	collection.bodySite.text
-uberon_id_anatomical_site	collection.bodySite.text
-patient_id	subject.reference
-age_at_event_days	collection._collectedDateTime.extension[0].extension[3].valueDuration.value
-dbgap_consent_code	meta.security[1].code

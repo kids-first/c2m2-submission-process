@@ -1,6 +1,7 @@
 import pandas as pd
 
 from cfde_table_constants import add_constants, get_column_mappings, get_table_cols_from_c2m2_json
+from etl_types import ETLType
 
 
 project_title_row = {'id_namespace':'kidsfirst:',
@@ -120,7 +121,7 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     """
     the_df = add_constants(the_df, c2m2_entity_name=entity_name)
 
-    the_df.rename(columns=get_column_mappings(entity_name),inplace=True)
+    the_df.rename(columns=get_column_mappings(ETLType.DS, entity_name),inplace=True)
     # Very disgusting
     if entity_name == 'file':
         the_df['size_in_bytes'].fillna(0,inplace=True)

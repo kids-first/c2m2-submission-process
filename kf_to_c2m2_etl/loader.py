@@ -24,6 +24,7 @@ class TsvLoader:
 
         get_dcc_df().to_csv(os.path.join(self.tsv_dir,'dcc.tsv'),sep='\t',index=False)
         get_id_namespace().to_csv(os.path.join(self.tsv_dir,'id_namespace.tsv'),sep='\t',index=False)
+        add_project_title_row(os.path.join(self.tsv_dir,'project.tsv'))
 
         # iterate over the TSV files in the directory
         for filename in os.listdir(self.tsv_dir):
@@ -89,6 +90,20 @@ def get_id_namespace():
          'description':'A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.',
          }
     ])
+
+
+def add_project_title_row(project_file_path):
+    project_title_row = {'id_namespace':'kidsfirst:',
+                         'local_id':'drc',
+                         'persistent_id':'',
+                         'creation_time':'',
+                         'abbreviation':'KFDRC',
+                         'name':'The Gabriella Miller Kids First Pediatric Research Program',
+                         'description':'''A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.'''}
+
+    project_df = pd.read_csv(project_file_path,sep='\t')
+    project_df = pd.concat([pd.DataFrame(project_title_row,index=[0]),project_df]).reset_index(drop=True)
+    project_df.to_csv(project_file_path,sep='\t',index=False)
 
 
 if __name__ == "__main__":
