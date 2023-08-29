@@ -150,6 +150,7 @@ def update_persistent_id(row):
 def convert_fhir_to_file(the_df: pd.DataFrame):
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_content_0_format_display')
     the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_type_coding_0_code')
+    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_category_0_text')
 
     the_df['Specimen_meta_security_1_code'] = the_df['Specimen_meta_security_1_code'].apply(modify_dbgap)
 
