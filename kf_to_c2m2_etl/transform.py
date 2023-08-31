@@ -7,6 +7,7 @@ from cfde_convert import kf_to_cfde_value_converter
 from table_ops import TableJoiner, reshape_kf_combined_to_c2m2
 from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
+from etl_types import ETLType
 
 from value_converter import modify_dbgap, get_persistent_id, \
                             path_to_filename, convert_days_to_years, \
@@ -97,8 +98,8 @@ def convert_kf_to_project_in_project(base_df):
 @convert_kf_to_c2m2
 def convert_kf_to_subject(kf_parts: pd.DataFrame):
     logging.info('Converting kf to c2m2 subject')
-    subject_df = kf_to_cfde_value_converter(kf_parts,'PT_gender')
-    subject_df = kf_to_cfde_value_converter(subject_df,'PT_ethnicity')
+    subject_df = kf_to_cfde_value_converter(ETLType.DS, kf_parts,'PT_gender')
+    subject_df = kf_to_cfde_value_converter(ETLType.DS, subject_df,'PT_ethnicity')
     return subject_df
 
 
@@ -161,8 +162,8 @@ def convert_kf_to_file(kf_genomic_files):
                     .get_result()
 
 
-    file_df = kf_to_cfde_value_converter(kf_genomic_files,'GF_file_format')
-    file_df = kf_to_cfde_value_converter(file_df,'GF_data_type')
+    file_df = kf_to_cfde_value_converter(ETLType.DS, kf_genomic_files,'GF_file_format')
+    file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'GF_data_type')
     
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
     file_df['persistent_id'] = file_df.apply(lambda the_df: 
