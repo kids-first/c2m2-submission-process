@@ -109,7 +109,8 @@ def convert_kf_to_subject(kf_parts: pd.DataFrame):
 def convert_kf_to_biosample(kf_combined_df):
     logging.info('Converting kf to c2m2 biosample')
     kf_combined_df['BS_uberon_id_anatomical_site'] = kf_combined_df.apply(lambda the_df: 
-                                                                    apply_uberon_mapping(the_df['BS_source_text_anatomical_site'],
+                                                                    apply_uberon_mapping(ETLType.DS,
+                                                                                         the_df['BS_source_text_anatomical_site'],
                                                                                          the_df['BS_uberon_id_anatomical_site']),
                                                                     axis=1)
     return kf_combined_df
