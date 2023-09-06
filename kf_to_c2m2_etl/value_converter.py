@@ -43,7 +43,9 @@ def apply_fhir_uberon_mapping(uberon_id):
              
 
 def apply_uberon_mapping(etl_type: ETLType, *args):
+    if not isinstance(etl_type,ETLType):
+        raise Exception("ETL type not provided")
     if etl_type == ETLType.FHIR:
-        apply_fhir_uberon_mapping(args[0])
+        return apply_fhir_uberon_mapping(args[0])
     elif etl_type == ETLType.DS:
-        apply_kf_uberon_mapping(args[0],args[1])
+        return apply_kf_uberon_mapping(args[0],args[1])

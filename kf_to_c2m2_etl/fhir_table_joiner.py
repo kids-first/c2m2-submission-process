@@ -65,7 +65,7 @@ def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     Returns:
         pd.DataFrame: A C2M2-formatted table for the given entity.
     """
-    the_df = add_constants(the_df, c2m2_entity_name=entity_name)
+    the_df = add_constants(ETLType.FHIR, the_df, c2m2_entity_name=entity_name)
 
     the_df.rename(columns=get_column_mappings(ETLType.FHIR, entity_name),inplace=True)
 

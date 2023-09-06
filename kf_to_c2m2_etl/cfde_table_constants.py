@@ -52,7 +52,7 @@ def get_column_mappings(ingest_type: ETLType, c2m2_entity_name: str):
 
     return mapping_dict
 
-def get_hard_coded_columns(c2m2_entity_name: str):
+def get_hard_coded_columns(etl_type: ETLType, c2m2_entity_name: str):
     """
     Get a dictionary of hard-coded constants for the specified C2M2 entity.
 
@@ -62,13 +62,15 @@ def get_hard_coded_columns(c2m2_entity_name: str):
     Returns:
         dict: A dictionary of hard-coded constants for the specified C2M2 entity.
     """
-    constants_path = os.path.join(file_locations.get_kf_to_c2m2_mappings_path(),'table_constants.tsv')
+    file_prefix = 'fhir' if etl_type == ETLType.FHIR else 'ds'
+    constants_path = os.path.join(file_locations.get_kf_to_c2m2_mappings_path(),f'{file_prefix}_table_constants.tsv')
+
     constants_df = pd.read_table(constants_path)
     constants_df.query(f'entity_name == "{c2m2_entity_name}"',inplace=True)
     mapping_dict = dict(zip(constants_df.col_name,constants_df.col_value))
     return mapping_dict
 
-def add_constants(original_df: pd.DataFrame, c2m2_entity_name: str):
+def add_constants(etl_type: ETLType, original_df: pd.DataFrame, c2m2_entity_name: str):
     """
     Add hard-coded constants to the specified dataframe for the specified C2M2 entity.
 
@@ -79,7 +81,7 @@ def add_constants(original_df: pd.DataFrame, c2m2_entity_name: str):
     Returns:
         pd.DataFrame: A copy of the original dataframe with the hard-coded constants added.
     """
-    for key, value in get_hard_coded_columns(c2m2_entity_name).items():
+    for key, value in get_hard_coded_columns(etl_type, c2m2_entity_name).items():
         original_df[key] = value
 
     return original_df.copy(deep=True)
