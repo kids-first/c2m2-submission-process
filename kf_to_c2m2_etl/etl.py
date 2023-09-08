@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import shutil
+import argparse
 
 from pandas_io_util import handle_pre_existing_files
 
@@ -17,7 +18,7 @@ kf_studies_on_fhir = ['SD_JWS3V24D','SD_FFVQ3T38','SD_DYPMEHHF']
 
 def main():
 
-    ingest_type = get_etl_type_from_user() 
+    ingest_type = get_etl_type_from_command_line_args() 
 
     if ingest_type == ETLType.DS:
         studies = pd.read_table(portal_studies_path)['studies_on_portal'].to_list()
@@ -60,16 +61,14 @@ def prepare_etl_directories():
             print(f"Directory '{directory}' already exists. Skipping directory creation.") 
 
 
-def get_etl_type_from_user():
-    while True:
-        user_input = input("Would you like to do an etl from FHIR or DS? ").upper()
+def get_etl_type_from_command_line_args():
+    parser = argparse.ArgumentParser(description="ETL Type")
 
-        if user_input == 'FHIR':
-            return ETLType.FHIR
-        elif user_input == 'DS':
-            return ETLType.DS
-        else:
-            print("Invalid input. Please enter 'FHIR' or 'DS'.")
+    parser.add_argument("etl_type", 
+                        choices=["FHIR", "DS","fhir","ds"], 
+                        help="Specify the ETL type (FHIR or DS)")
+
+    return ETLType.from_string(parser.parse_args().etl_type)
 
 
 if __name__ == "__main__":
