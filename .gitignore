@@ -18,3 +18,4 @@ prepare_C2M2_submission.py
 *.txt
 *.pyc
 *.zip
+*.env
