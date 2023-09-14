@@ -30,7 +30,6 @@ file_describes_biosample	biosample_id_namespace	kidsfirst:
 file	id_namespace	kidsfirst:
 file	project_id_namespace	kidsfirst:
 file	compression_format	
-file	assay_type	
 file	analysis_type	
 file	mime_type	
 file	bundle_collection_id_namespace	
