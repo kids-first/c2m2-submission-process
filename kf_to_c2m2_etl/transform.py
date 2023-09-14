@@ -185,7 +185,7 @@ def convert_kf_to_file(kf_genomic_files):
 
     file_df = kf_to_cfde_value_converter(ETLType.DS, kf_genomic_files,'GF_file_format')
     file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'GF_data_type')
-    file_df = kf_to_cfde_value_converter(file_df,'SE_experiment_strategy')
+    file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'SE_experiment_strategy')
     
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
     file_df['persistent_id'] = file_df.apply(lambda the_df: 
