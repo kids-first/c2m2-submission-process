@@ -8,6 +8,8 @@
 /.vscode
 /kf_to_c2m2_etl/transformed
 /kf_to_c2m2_etl/ingested
+/submission_diff_inquiry/*.db
+/submission_diff_inquiry/*/
 /share
 /etc
 frictionlessreport*.txt
@@ -18,3 +20,4 @@ prepare_C2M2_submission.py
 *.txt
 *.pyc
 *.zip
+*.env
