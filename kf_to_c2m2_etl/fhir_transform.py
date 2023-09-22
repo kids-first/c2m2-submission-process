@@ -120,7 +120,7 @@ def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
                           left_on='meta_tag_0_code',
                           right_on='study_id')
     # There is not disease mapping for the following study
-    the_df.drop(the_df.query('identifier_0_value == "SD_DZ4GPQX6"').index,inplace=True)
+    the_df.drop(the_df.query('meta_tag_0_code == "SD_DZ4GPQX6"').index,inplace=True)
 
     return the_df
 
@@ -132,7 +132,7 @@ def convert_fhir_to_biosample_disease(the_df: pd.DataFrame):
                           left_on='meta_tag_0_code',
                           right_on='study_id')
     # There is not disease mapping for the following study
-    the_df.drop(the_df.query('identifier_0_value == "SD_DZ4GPQX6"').index,inplace=True)
+    the_df.drop(the_df.query('meta_tag_0_code == "SD_DZ4GPQX6"').index,inplace=True)
 
     return the_df
 
