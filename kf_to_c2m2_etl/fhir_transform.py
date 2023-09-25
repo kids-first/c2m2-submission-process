@@ -112,22 +112,35 @@ def convert_fhir_to_biosample_from_subject(the_df: pd.DataFrame):
         the_df[age_at_even_days_col_name] = None
     return the_df
 
+def remove_studies_without_disease_mapping(the_df: pd.DataFrame):
+    disease_mapping_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+    no_disease_df = disease_mapping_df.loc[(disease_mapping_df['DOID'] == 'NA') | (disease_mapping_df['DOID'].isna())]
+    return the_df[~the_df['meta_tag_0_code'].isin(no_disease_df['study_id'])]
+
 @convert_fhir_to_c2m2
 def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
     project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+
     the_df = the_df.merge(project_disease_df,
                           how='inner',
                           left_on='meta_tag_0_code',
                           right_on='study_id')
+
+    the_df = remove_studies_without_disease_mapping(the_df)
+
     return the_df
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_biosample_disease(the_df: pd.DataFrame):
     project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+
     the_df = the_df.merge(project_disease_df,
                           how='inner',
                           left_on='meta_tag_0_code',
                           right_on='study_id')
+
+    the_df = remove_studies_without_disease_mapping(the_df)
+
     return the_df
 
 @convert_fhir_to_c2m2
