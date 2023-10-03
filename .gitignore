@@ -22,6 +22,7 @@ C2M2_datapackage.json
 prepare_C2M2_submission.py
 *.csv
 *.txt
+!/submission_diff_inquiry/requirements.txt
 *.pyc
 *.zip
 *.env
