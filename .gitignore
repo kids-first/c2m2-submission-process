@@ -9,7 +9,11 @@
 /kf_to_c2m2_etl/transformed
 /kf_to_c2m2_etl/ingested
 /submission_diff_inquiry/*.db
+# Added because the datapackages will be placed here, and this provides the means to ignore them.
+# If a project directory is needed the negation pattern can be used.
 /submission_diff_inquiry/*/
+# Negation for Sql Files
+!/submission_diff_inquiry/sql/
 /share
 /etc
 frictionlessreport*.txt
@@ -18,6 +22,7 @@ C2M2_datapackage.json
 prepare_C2M2_submission.py
 *.csv
 *.txt
+!/submission_diff_inquiry/requirements.txt
 *.pyc
 *.zip
 *.env

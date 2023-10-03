@@ -3,19 +3,15 @@ import pandas as pd
 import sqlite3
 from argparse import ArgumentParser
 
-app_directory = 'submission_diff_inquiry'
-
 def tsvs_to_sqlite(directory: str):
     # Derive the database name from the directory name
-    print(os.getcwd())
     root_dir = directory.split('/')[0] if '/' in directory else directory
     db_name = root_dir + '.db'
     
     # Connect to SQLite database
-    conn = sqlite3.connect(os.path.join(app_directory,db_name))
+    conn = sqlite3.connect(db_name)
     
     # List all .tsv files in the directory
-    directory = os.path.join(app_directory,directory)
     tsv_files = [f for f in os.listdir(directory) if f.endswith('.tsv')]
     
     for tsv_file in tsv_files:
