@@ -7,7 +7,8 @@ from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
 from cfde_convert import kf_to_cfde_value_converter
 from file_locations import file_locations
 from etl_types import ETLType
-from value_converter import convert_days_to_years, modify_dbgap, \
+from value_converter import convert_days_to_years, \
+                            modify_dbgap, \
                             apply_uberon_mapping
 
 
