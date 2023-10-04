@@ -7,8 +7,6 @@ from typing import List
 
 from fhir_pyrate import Ahoy, Pirate
 
-from file_locations import file_locations
-from associations import AssociationBuilder
 from pandas_io_util import PandasCsvUpdater
 
 
@@ -33,10 +31,6 @@ fhir_resource_mapping = {"participants":"Patient",
                          "biospecimens":"Specimen",
                          "genomic-files":"DocumentReference"}
 
-def get_fhir_mapping(entity_name: str) -> List[tuple]:
-    mapping_path = os.path.join(file_locations.get_fhir_mapping_paths(),f'{entity_name}_mapping.tsv')
-    mapping_df = pd.read_table(mapping_path)
-    return mapping_df.to_records(index=False).tolist()
 
 
 def convert_drs_uri_to_did(the_df : pd.DataFrame):
@@ -73,21 +67,18 @@ class FhirIngest:
                 self.studies,
                 resource_type=fhir_resource,
                 df_constraints={"_tag":"studies"},
-                # fhir_paths=get_fhir_mapping(kf_entity)
             )
 
             df_dict.setdefault(fhir_resource,the_df)
 
         df_dict.setdefault('ResearchStudy',self.studies_df)
 
-        # df_dict = build_relationships(df_dict)
 
         return {','.join(self.studies['studies'].to_list()): df_dict}
 
     def _get_studies():
         studies_df = pirate.steal_bundles_to_dataframe(
                 resource_type='ResearchStudy',
-                # fhir_paths=get_fhir_mapping('studies')
         )
         studies_df = studies_df[~studies_df['identifier_0_value'].isin(include_studies_to_exclude)]
         return studies_df
@@ -100,6 +91,12 @@ def write_fhir_studies_to_disk(studies_dict: dict):
                 PandasCsvUpdater(endpoint,the_df).update_csv_with_df()
 
 
-def build_relationships(df_dict):
-    df_dict['biospecimens'] = AssociationBuilder(df_dict['biospecimens'],df_dict['participants']).establish_association()
-    return df_dict
+def get_fhir_resource_by_study(resource_name: str, study_list: list, fhir_paths = None) -> pd.DataFrame:
+    the_df = pirate.trade_rows_for_dataframe(
+            pd.DataFrame({'studies': study_list}),
+            resource_type=resource_name,
+            df_constraints={"_tag":"studies"},
+            fhir_paths=fhir_paths
+        )
+    
+    return the_df
