@@ -1,8 +1,11 @@
 import yaml
 import os
 
-CONFIG_FILE = os.path.join(os.getcwd(),'kf_to_c2m2_etl','file_locations.yaml')
-
+ETL_DIR = 'kf_to_c2m2_etl'
+if ETL_DIR not in os.getcwd():
+    CONFIG_FILE = os.path.join(os.getcwd(),'kf_to_c2m2_etl','file_locations.yaml')
+else:
+    CONFIG_FILE = os.path.join(os.getcwd(),'file_locations.yaml')
 class FileLocations:
     _instance = None
 
@@ -50,3 +53,4 @@ class FileLocations:
         return self.config['paths']['auto_gen_path']
 
 file_locations = FileLocations()
+print(f'etl path: {file_locations.get_etl_path()}')
