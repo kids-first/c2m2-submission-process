@@ -110,6 +110,31 @@ def kf_to_cfde_value_converter(etl_type: ETLType,target_df: pd.DataFrame, target
 
     return target_df
 
+def fhir_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
+    col_mapping = get_fhir_column_mapping(target_column)
+
+    c2m2_field_header_name = 'C2M2 Field'
+    fhir_field_header_name = 'FHIR Field'
+    
+    conversion_table = get_conversion_table(ETLType.FHIR, target_column)
+
+    target_column = f'{col_mapping["FHIR Resource"]}_{target_column}'
+
+    target_column_df = target_df[[target_column]]
+
+    conversion_df = target_column_df.merge(conversion_table,
+                                        how='left',
+                                        left_on=target_column,
+                                        right_on='name'
+                                        )[['id']]
+    
+    conversion_df.rename(columns={'id':col_mapping[c2m2_field_header_name]},inplace=True)
+
+    target_df[target_column] = conversion_df[col_mapping[c2m2_field_header_name]]
+
+    return target_df
+
+
 uberon_mapping_df = pd.read_csv(os.path.join(file_locations.get_ontology_mappings_path(),'anatomy_fixed_tabs.tsv'),sep='\t').fillna('')
 uberon_mapping_df['composition_term'] = uberon_mapping_df['composition_term'].apply(str.lower)
 uberon_mapping_df['uberon_id'] = uberon_mapping_df['uberon_id'].apply(str.lower)

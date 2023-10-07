@@ -48,6 +48,10 @@ def get_column_mappings(ingest_type: ETLType, c2m2_entity_name: str):
         mapping_path = os.path.join(file_locations.get_fhir_mapping_paths(),f'{c2m2_entity_name}.tsv')
         column_mapping_df = pd.read_table(mapping_path)
         column_mapping_df.query(f'`C2M2 Entity` == "{c2m2_entity_name}"',inplace=True)
+        column_mapping_df['FHIR Field'] = column_mapping_df.apply(
+            add_prefix_to_fhir_field,
+            axis=1
+        )
         mapping_dict = dict(zip(column_mapping_df['FHIR Field'], column_mapping_df['C2M2 Field']))
 
     return mapping_dict
@@ -85,3 +89,12 @@ def add_constants(etl_type: ETLType, original_df: pd.DataFrame, c2m2_entity_name
         original_df[key] = value
 
     return original_df.copy(deep=True)
+
+
+def add_prefix_to_fhir_field(row):
+    fhir_resource_types = ['ResearchStudy','Patient','Specimen','DocumentReference']
+
+    if row["FHIR Resource"] in fhir_resource_types:
+        return f'{row["FHIR Resource"]}_{row["FHIR Field"]}'
+    else:
+        return row["FHIR Field"]

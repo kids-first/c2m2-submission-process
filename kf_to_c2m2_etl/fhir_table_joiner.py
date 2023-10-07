@@ -15,43 +15,38 @@ class FhirDataJoiner:
                     'DocumentReference': {'left': 'Patient_id', 'right': 'DocumentReference_subject_reference'}},
         'Specimen': {'Patient': {'left': 'Specimen_subject_reference', 'right': 'Patient_id'},
                      'DocumentReference': {'left': 'Specimen_id', 'right': 'DocumentReference_context_related_0_reference'}},
-        'DocumentReference': {'Patient': {'left': 'subject_reference', 'right': 'patient_id'},
-                              'Specimen': {'left': 'subject_reference', 'right': 'specimen_id'}}
+        'DocumentReference': {'Patient': {'left': 'DocumentReference_subject_reference', 'right': 'Patient_id'},
+                              'Specimen': {'left': 'DocumentReference_context_related_0_reference', 'right': 'Specimen_id'}}
     }
 
-    def __init__(self, resource_list):
+    def __init__(self, resource_list: list):
         self.resource_list = resource_list
         self.resource_dataframes = load_resources(resource_list)
 
     def join_resources(self):
-        if len(self.resource_list) < 2:
-            only_resource = self.resource_list[0]
-            print(f"Not enough resources to join. Returning {only_resource} resource.")
-            return self.resource_dataframes.get(only_resource)
+        base_df_resource, *remaining_resources = self.resource_list
+        base_df = add_resource_prefix(self.resource_dataframes.get(base_df_resource))
+        joined_resources = [base_df_resource]
+        
+        for resource_to_join in remaining_resources:
+            joining_df = add_resource_prefix(self.resource_dataframes.get(resource_to_join))
 
-        joined_df = self.resource_dataframes.get(self.resource_list[0])
-        if joined_df is None:
-            raise ValueError(f"DataFrame not found for resource {self.resource_list[0]}")
-
-        for i in range(1, len(self.resource_list)):
-            resource_name = self.resource_list[i]
-            df = self.resource_dataframes.get(resource_name)
-
-            if df is None:
-                raise ValueError(f"DataFrame not found for resource {resource_name}")
-
-            mapping = FhirDataJoiner.foreign_key_mappings.get(self.resource_list[i - 1], {}).get(resource_name)
+            mapping = FhirDataJoiner.foreign_key_mappings.get(joined_resources[-1]).get(resource_to_join)
             if mapping:
                 left_key = mapping['left']
                 right_key = mapping['right']
-                joined_df = add_resource_prefix(joined_df)
-                df = add_resource_prefix(df)
-                df[right_key] = df[right_key].apply(strip_id_from_association)
-                joined_df = pd.merge(joined_df, df, left_on=left_key, right_on=right_key, how='inner')
-            else:
-                raise ValueError(f"No mapping found for joining {self.resource_list[i - 1]} and {resource_name}")
 
-        return joined_df
+                if '_id' not in left_key:
+                    base_df[left_key] = base_df[left_key].apply(strip_id_from_association)
+                if '_id' not in right_key:
+                    joining_df[right_key] = joining_df[right_key].apply(strip_id_from_association)
+
+                base_df = base_df.merge(joining_df, 
+                                        how='inner', 
+                                        left_on=left_key, 
+                                        right_on=right_key)
+
+        return base_df
 
 
 def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
@@ -76,8 +71,10 @@ def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
 def strip_id_from_association(the_col):
     if pd.isna(the_col):
         return None
-    else:
+    elif isinstance(the_col,str) and len(the_col.split('/')) > 1:
         return int(the_col.split('/')[-1])
+    else:
+        return the_col
 
 def load_resources(resource_list: list):
     fhir_resource_dataframe_dict = {}
