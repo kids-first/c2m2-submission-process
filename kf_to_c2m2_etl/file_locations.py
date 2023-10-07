@@ -53,4 +53,3 @@ class FileLocations:
         return self.config['paths']['auto_gen_path']
 
 file_locations = FileLocations()
-print(f'etl path: {file_locations.get_etl_path()}')
