@@ -4,10 +4,11 @@ import pandas as pd
 import numpy as np
 
 from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
-from cfde_convert import kf_to_cfde_value_converter
+from cfde_convert import kf_to_cfde_value_converter, fhir_to_cfde_value_converter
 from file_locations import file_locations
 from etl_types import ETLType
-from value_converter import convert_days_to_years, modify_dbgap, \
+from value_converter import convert_days_to_years, \
+                            modify_dbgap, \
                             apply_uberon_mapping
 
 
@@ -86,19 +87,19 @@ def convert_fhir_to_project_in_project(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_project(the_df: pd.DataFrame):
-    the_df['abbreviation'] = the_df['identifier_0_value']
+    the_df['abbreviation'] = the_df['ResearchStudy_identifier_0_value']
     return the_df
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_subject(the_df: pd.DataFrame):
-    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'gender')
-    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'extension_1_extension_0_valueString')
+    the_df = fhir_to_cfde_value_converter(the_df, 'gender')
+    the_df = fhir_to_cfde_value_converter(the_df, 'extension_1_extension_0_valueString')
     return the_df
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_biosample(the_df: pd.DataFrame):
-    the_df['collection_bodySite_text'] = the_df.apply(lambda the_df: 
-                                                          apply_uberon_mapping(ETLType.FHIR,the_df['collection_bodySite_text']),
+    the_df['Specimen_collection_bodySite_text'] = the_df.apply(lambda the_df: 
+                                                          apply_uberon_mapping(ETLType.FHIR,the_df['Specimen_collection_bodySite_text']),
                                                           axis=1)
     return the_df
 
@@ -112,10 +113,10 @@ def convert_fhir_to_biosample_from_subject(the_df: pd.DataFrame):
         the_df[age_at_even_days_col_name] = None
     return the_df
 
-def remove_studies_without_disease_mapping(the_df: pd.DataFrame):
+def remove_studies_without_disease_mapping(resource_name, the_df: pd.DataFrame):
     disease_mapping_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
     no_disease_df = disease_mapping_df.loc[(disease_mapping_df['DOID'] == 'NA') | (disease_mapping_df['DOID'].isna())]
-    return the_df[~the_df['meta_tag_0_code'].isin(no_disease_df['study_id'])]
+    return the_df[~the_df[f'{resource_name}_meta_tag_0_code'].isin(no_disease_df['study_id'])]
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
@@ -123,10 +124,10 @@ def convert_fhir_to_subject_disease(the_df: pd.DataFrame):
 
     the_df = the_df.merge(project_disease_df,
                           how='inner',
-                          left_on='meta_tag_0_code',
+                          left_on='Patient_meta_tag_0_code',
                           right_on='study_id')
 
-    the_df = remove_studies_without_disease_mapping(the_df)
+    the_df = remove_studies_without_disease_mapping('Patient',the_df)
 
     return the_df
 
@@ -136,10 +137,10 @@ def convert_fhir_to_biosample_disease(the_df: pd.DataFrame):
 
     the_df = the_df.merge(project_disease_df,
                           how='inner',
-                          left_on='meta_tag_0_code',
+                          left_on='Specimen_meta_tag_0_code',
                           right_on='study_id')
 
-    the_df = remove_studies_without_disease_mapping(the_df)
+    the_df = remove_studies_without_disease_mapping('Specimen',the_df)
 
     return the_df
 
@@ -161,9 +162,9 @@ def update_persistent_id(row):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_file(the_df: pd.DataFrame):
-    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_content_0_format_display')
-    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_type_coding_0_code')
-    the_df = kf_to_cfde_value_converter(ETLType.FHIR, the_df, 'DocumentReference_category_0_text')
+    the_df = fhir_to_cfde_value_converter(the_df, 'content_0_format_display')
+    the_df = fhir_to_cfde_value_converter(the_df, 'type_coding_0_code')
+    the_df = fhir_to_cfde_value_converter(the_df, 'category_0_text')
 
     the_df['Specimen_meta_security_1_code'] = the_df['Specimen_meta_security_1_code'].apply(modify_dbgap)
 
