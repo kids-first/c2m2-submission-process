@@ -1,15 +1,9 @@
 import pandas as pd
 
 from cfde_table_constants import add_constants, get_column_mappings, get_table_cols_from_c2m2_json
+from etl_types import ETLType
 
 
-project_title_row = {'id_namespace':'kidsfirst:',
-                                  'local_id':'drc',
-                                  'persistent_id':'',
-                                  'creation_time':'',
-                                  'abbreviation':'KFDRC',
-                                  'description':'''A large-scale data resource to help researchers uncover new insights into the biology of childhood cancer and structural birth defects.''',
-                                  'name':'The Gabriella Miller Kids First Pediatric Research Program'}
 
 def apply_prefix_to_columns(the_df: pd.DataFrame):
     """
@@ -118,9 +112,9 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     Returns:
         pd.DataFrame: A C2M2-formatted table for the given entity.
     """
-    the_df = add_constants(the_df, c2m2_entity_name=entity_name)
+    the_df = add_constants(ETLType.DS, the_df, c2m2_entity_name=entity_name)
 
-    the_df.rename(columns=get_column_mappings(entity_name),inplace=True)
+    the_df.rename(columns=get_column_mappings(ETLType.DS, entity_name),inplace=True)
     # Very disgusting
     if entity_name == 'file':
         the_df['size_in_bytes'].fillna(0,inplace=True)
@@ -128,9 +122,15 @@ def reshape_kf_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
         the_df = the_df.astype({"uncompressed_size_in_bytes":'int',
                                 "size_in_bytes":'int'})
 
-    if entity_name == 'project':
-        the_df = pd.concat([pd.DataFrame(project_title_row,index=[0]),the_df]).reset_index(drop=True)
-
     the_df = the_df[get_table_cols_from_c2m2_json(entity_name)]
 
     return the_df
+
+def is_column_present(file_path, column_name):
+    try:
+        # Read only the first row (header) of the CSV file
+        header = pd.read_csv(file_path, nrows=1).columns.tolist()
+        return column_name in header
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return False

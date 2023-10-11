@@ -9,7 +9,7 @@ import pandas as pd
 from kf_utils.dataservice.descendants import find_descendants_by_kfids 
 from pandas_io_util import PandasCsvUpdater
 from time_keeper import Timer
-
+from etl_types import ETLType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -141,13 +141,21 @@ class Ingest:
 
         return mapped_df_dict
 
-targets = ['participants','diagnoses','studies',
-             'biospecimens','biospecimen-diagnoses',
-             'genomic-files','biospecimen-genomic-files']
+
+endpoint_targets = ['studies',
+                    'participants',
+                    'biospecimens',
+                    'diagnoses',
+                    'biospecimen-diagnoses',
+                    'biospecimen-genomic-files',
+                    'genomic-files',
+                    'sequencing-experiment-genomic-files',
+                    'sequencing-experiments']
+
 
 def write_studies_to_disk(studies_dict: dict):
     for index, (study, endpoints) in enumerate(studies_dict.items()):
         for endpoint, the_df in endpoints.items():
-            if isinstance(the_df,pd.DataFrame) and endpoint in targets:
+            if isinstance(the_df,pd.DataFrame) and endpoint in endpoint_targets:
                 the_df.sort_values(by=['kf_id'],inplace=True)
                 PandasCsvUpdater(endpoint,the_df).update_csv_with_df()

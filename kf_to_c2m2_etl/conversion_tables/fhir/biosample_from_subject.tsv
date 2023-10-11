@@ -1,0 +1,4 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+Specimen	identifier_0_value	biosample_from_subject	biosample_local_id
+Patient	identifier_0_value	biosample_from_subject	subject_local_id
+Specimen	collection__collectedDateTime_extension_0_extension_3_valueDuration_value	biosample_from_subject	age_at_sampling
