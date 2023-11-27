@@ -40,7 +40,13 @@ source setup_evn.sh
 - OSF cli tool grabbing the C2M2 data package to validate the submission
 
 ```bash
+# To get OSF Tools
 ./acquire_osf_c2m2_submission_tools.sh
+```
+OR
+```bash
+# To refresh OSF Tools
+./acquire_osf_c2m2_submission_tools.sh refresh
 ```
 
 3. Execute kf to c2m2 etl process
