@@ -68,6 +68,10 @@ def transform_kf_to_c2m2_on_disk():
                                           sort_on=['biosample_local_id','file_local_id'],
                                           ascending_sort=True)
 
+    convert_kf_to_file_describes_subject(kf_combined_list=['portal_studies','participant','biospecimen','biospecimen_genomic_file','genomic_files'],
+                                          c2m2_entity_name='file_describes_subject',
+                                          sort_on='file_local_id',
+                                          ascending_sort=True)
 
 def convert_kf_to_c2m2(func):
     def wrapper(**kwargs):
@@ -143,6 +147,11 @@ def convert_kf_to_subject_role_taxonomy(kf_combined_df):
     logging.info('Converting kf to c2m2 subject role taxomonmy')
     return kf_combined_df
 
+
+@convert_kf_to_c2m2
+def convert_kf_to_file_describes_subject(kf_combined_df: pd.DataFrame):
+    logging.info('Converting kf to c2m2 file describes subject')
+    return kf_combined_df
 
 @convert_kf_to_c2m2
 def convert_kf_to_file(kf_genomic_files):
