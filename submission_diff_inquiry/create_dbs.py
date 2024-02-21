@@ -38,7 +38,7 @@ def get_cli_args():
     parser.add_argument("dirs", metavar="DIRECTORIES", type=str, nargs='+',help='a list of directories')
     parser.add_argument("--file-type", default="tsv", type=str, help='file extension of data tables')
     parser.add_argument("--name-origin",default="start_of_path",type=str, help='get db name from start or end of data file path')
-    parser.add_argument("--db-name",default="database",type=str, help='Set db name')
+    parser.add_argument("--db-name",type=str, help='Set db name')
     args = parser.parse_args()
     return args
 
