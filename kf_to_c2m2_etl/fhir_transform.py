@@ -63,6 +63,11 @@ def transform_fhir_to_c2m2_on_disk():
                                           sort_on=['biosample_local_id','file_local_id'],
                                           ascending_sort=True)
 
+    convert_fhir_to_file_describes_subject(fhir_combined_list=['Patient','DocumentReference'],
+                                          c2m2_entity_name='file_describes_subject',
+                                          sort_on=['file_local_id'],
+                                          ascending_sort=True)
+
 
 def convert_fhir_to_c2m2(func):
     def wrapper(**kwargs):
@@ -175,6 +180,10 @@ def convert_fhir_to_file(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_file_describes_biosample(the_df: pd.DataFrame):
+    return the_df
+
+@convert_fhir_to_c2m2
+def convert_fhir_to_file_describes_subject(the_df: pd.DataFrame):
     return the_df
 
 if __name__ == "__main__":
