@@ -1,0 +1,3 @@
+FHIR Resource	FHIR Field	C2M2 Entity	C2M2 Field
+DocumentReference	identifier_0_value	file_describes_subject	file_local_id
+Patient	identifier_0_value	file_describes_subject	subject_local_id

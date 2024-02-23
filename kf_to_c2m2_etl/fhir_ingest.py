@@ -49,14 +49,17 @@ class FhirIngest:
 
         # Reduce study df to selected studies if supplied
         if selected_studies is not None:
-            selected_studies_df = pd.DataFrame({'kf_id':selected_studies})
+            if not isinstance(selected_studies,pd.DataFrame):
+                selected_studies = pd.DataFrame({'study_id':selected_studies})
+            
 
-            self.studies_df = self.studies_df.merge(selected_studies_df,
+            self.studies_df = self.studies_df.merge(selected_studies,
                                                     how='inner',
                                                     left_on='identifier_0_value',
-                                                    right_on='kf_id')
+                                                    right_on='study_id')
 
-        self.studies = pd.DataFrame({'studies': self.studies_df['kf_id'].to_list()})
+
+        self.studies = pd.DataFrame({'studies': self.studies_df['study_id'].to_list()})
 
 
     def extract(self) -> defaultdict:

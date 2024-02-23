@@ -2,6 +2,7 @@
 delete_files() {
     echo "Deleting submission_tools and C2M2_datapackage.json for refresh..."
     rm -rf submission_tools
+    rm -rf external_CV_reference_files
     rm -f C2M2_datapackage.json
 }
 
