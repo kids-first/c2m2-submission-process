@@ -3,8 +3,11 @@ import os
 import pandas as pd
 import numpy as np
 
-from fhir_table_joiner import FhirDataJoiner, reshape_fhir_combined_to_c2m2
-from cfde_convert import kf_to_cfde_value_converter, fhir_to_cfde_value_converter
+from fhir_table_joiner import FhirDataJoiner, \
+                            reshape_fhir_combined_to_c2m2, \
+                            strip_id_from_association
+
+from cfde_convert import  fhir_to_cfde_value_converter
 from file_locations import file_locations
 from etl_types import ETLType
 from value_converter import convert_days_to_years, \
@@ -53,7 +56,7 @@ def transform_fhir_to_c2m2_on_disk():
                                         sort_on='subject_local_id',
                                         ascending_sort=True)
 
-    convert_fhir_to_file(fhir_combined_list=['Specimen','DocumentReference'],
+    convert_fhir_to_file(fhir_combined_list=['DocumentReference'],
                          c2m2_entity_name='file',
                          sort_on='local_id',
                          ascending_sort=True)
@@ -167,6 +170,17 @@ def update_persistent_id(row):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_file(the_df: pd.DataFrame):
+
+    specimen_ref_key = 'DocumentReference_context_related_0_reference'
+    the_df[specimen_ref_key] = the_df[specimen_ref_key].apply(strip_id_from_association)
+
+    specimen_df = FhirDataJoiner(["Specimen"]).join_resources()
+
+    the_df = the_df.merge(specimen_df,
+                          how="left",
+                          left_on="DocumentReference_context_related_0_reference",
+                          right_on="Specimen_id")
+
     the_df = fhir_to_cfde_value_converter(the_df, 'content_0_format_display')
     the_df = fhir_to_cfde_value_converter(the_df, 'type_coding_0_code')
     the_df = fhir_to_cfde_value_converter(the_df, 'category_0_text')
