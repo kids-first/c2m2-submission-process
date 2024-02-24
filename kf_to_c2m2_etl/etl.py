@@ -14,7 +14,6 @@ from loader import TsvLoader
 from file_locations import file_locations
 
 portal_studies_path = os.path.join(file_locations.get_etl_path(),'studies_on_portal.tsv')
-kf_studies_on_fhir = ['SD_JWS3V24D','SD_FFVQ3T38','SD_DYPMEHHF']
 
 def main():
 
