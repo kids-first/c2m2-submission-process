@@ -56,7 +56,7 @@ def transform_fhir_to_c2m2_on_disk():
                                         sort_on='subject_local_id',
                                         ascending_sort=True)
 
-    convert_fhir_to_file(fhir_combined_list=['DocumentReference'],
+    convert_fhir_to_file(fhir_combined_list=['Specimen','DocumentReference'],
                          c2m2_entity_name='file',
                          sort_on='local_id',
                          ascending_sort=True)
@@ -66,7 +66,7 @@ def transform_fhir_to_c2m2_on_disk():
                                           sort_on=['biosample_local_id','file_local_id'],
                                           ascending_sort=True)
 
-    convert_fhir_to_file_describes_subject(fhir_combined_list=['Patient','DocumentReference'],
+    convert_fhir_to_file_describes_subject(fhir_combined_list=['Patient','Specimen','DocumentReference'],
                                           c2m2_entity_name='file_describes_subject',
                                           sort_on=['file_local_id'],
                                           ascending_sort=True)
@@ -74,6 +74,7 @@ def transform_fhir_to_c2m2_on_disk():
 
 def convert_fhir_to_c2m2(func):
     def wrapper(**kwargs):
+        print(f"Converting FHIR:{kwargs['fhir_combined_list']} to C2M2 {kwargs['c2m2_entity_name']}")
         fhir_combined_df = FhirDataJoiner(kwargs['fhir_combined_list']).join_resources()
         combined_adjusted = func(fhir_combined_df)
         c2m2_df = reshape_fhir_combined_to_c2m2(combined_adjusted,kwargs['c2m2_entity_name'])
@@ -113,7 +114,6 @@ def convert_fhir_to_biosample(the_df: pd.DataFrame):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_biosample_from_subject(the_df: pd.DataFrame):
-    print('Converting kf to c2m2 biosample from subject')
     age_at_even_days_col_name = 'Specimen_collection__collectedDateTime_extension_0_extension_3_valueDuration_value'
     if age_at_even_days_col_name in the_df.columns:
         the_df[age_at_even_days_col_name] = the_df[age_at_even_days_col_name].apply(convert_days_to_years)
@@ -170,16 +170,6 @@ def update_persistent_id(row):
 
 @convert_fhir_to_c2m2
 def convert_fhir_to_file(the_df: pd.DataFrame):
-
-    specimen_ref_key = 'DocumentReference_context_related_0_reference'
-    the_df[specimen_ref_key] = the_df[specimen_ref_key].apply(strip_id_from_association)
-
-    specimen_df = FhirDataJoiner(["Specimen"]).join_resources()
-
-    the_df = the_df.merge(specimen_df,
-                          how="left",
-                          left_on="DocumentReference_context_related_0_reference",
-                          right_on="Specimen_id")
 
     the_df = fhir_to_cfde_value_converter(the_df, 'content_0_format_display')
     the_df = fhir_to_cfde_value_converter(the_df, 'type_coding_0_code')
