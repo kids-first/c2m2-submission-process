@@ -46,8 +46,37 @@ class FhirDataJoiner:
                                         left_on=left_key, 
                                         right_on=right_key)
 
+                joined_resources.append(resource_to_join)
+
         return base_df
 
+
+def load_resources(resource_list: list):
+    fhir_resource_dataframe_dict = {}
+    for resource in resource_list:
+        if resource in fhir_resource_types:
+            resource_path = os.path.join(file_locations.get_ingested_path(),f'{resource}.csv')
+            the_df = pd.read_csv(resource_path,low_memory=False)
+            fhir_resource_dataframe_dict.setdefault(resource,the_df) 
+        else:
+            raise ValueError(f'Fhir Resource not found for {resource}')
+
+    return fhir_resource_dataframe_dict
+
+def add_resource_prefix(the_df: pd.DataFrame):
+    if 'resourceType' in the_df.columns:
+        resource = the_df.at[the_df['resourceType'].first_valid_index(),'resourceType']
+        the_df = the_df.add_prefix(f'{resource}_')
+
+    return the_df
+
+def strip_id_from_association(the_col):
+    if pd.isna(the_col):
+        return None
+    elif isinstance(the_col,str) and len(the_col.split('/')) > 1:
+        return int(the_col.split('/')[-1])
+    else:
+        return the_col
 
 def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     """
@@ -67,34 +96,6 @@ def reshape_fhir_combined_to_c2m2(the_df: pd.DataFrame, entity_name):
     the_df = the_df[get_table_cols_from_c2m2_json(entity_name)]
 
     return the_df
-
-def strip_id_from_association(the_col):
-    if pd.isna(the_col):
-        return None
-    elif isinstance(the_col,str) and len(the_col.split('/')) > 1:
-        return int(the_col.split('/')[-1])
-    else:
-        return the_col
-
-def load_resources(resource_list: list):
-    fhir_resource_dataframe_dict = {}
-    for resource in resource_list:
-        if resource in fhir_resource_types:
-            resource_path = os.path.join(file_locations.get_ingested_path(),f'{resource}.csv')
-            the_df = pd.read_csv(resource_path,low_memory=False)
-            fhir_resource_dataframe_dict.setdefault(resource,the_df) 
-        else:
-            raise ValueError(f'Fhir Resource not found for {resource}')
-
-    return fhir_resource_dataframe_dict
-
-
-def add_resource_prefix(the_df: pd.DataFrame):
-    if 'resourceType' in the_df.columns:
-        resource = the_df.at[the_df['resourceType'].first_valid_index(),'resourceType']
-        the_df = the_df.add_prefix(f'{resource}_')
-
-    return the_df 
 
 def get_fhir_table_for_column(target_col: str):
     try:
