@@ -83,10 +83,13 @@ class KfTableCombiner:
                 file_path = os.path.join(file_locations.get_ingested_path(),f'{table_to_endpoint_name[table_name]}.csv')
 
                 if table_name in kf_tablenames:
-                    if table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
-                        table_df = pd.read_csv(file_path, low_memory=False).query('visible == True')
-                    else:
-                        table_df = pd.read_csv(file_path, low_memory=False)
+                    table_df = pd.read_csv(file_path, low_memory=False)
+
+                    if table_name == "genomic_files":
+                        table_df = table_df[(table_df['visible']) & (table_df['file_format'] != "parquet")] 
+
+                    elif table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
+                        table_df = table_df[table_df['visible'] == True]
 
                     KfTableCombiner.df_dict[table_name] = table_df
 
