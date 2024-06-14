@@ -92,6 +92,13 @@ def convert_kf_to_c2m2(func):
 
 @convert_kf_to_c2m2
 def convert_kf_to_project(base_df):
+    # Remove Parent project's children
+    base_df = base_df[(base_df['SD_kf_id'] != 'SD_Z6MWD3H0') | 
+                      ((base_df['SD_kf_id'] == 'SD_Z6MWD3H0') & (base_df['SD_name'].str.contains("Kids First")))]
+
+    base_df = base_df[(base_df['SD_kf_id'] != 'SD_PREASA7S') | 
+                      ((base_df['SD_kf_id'] == 'SD_PREASA7S') & (base_df['SD_name'].str.contains("Kids First")))]
+
     base_df['abbreviation'] = base_df['SD_kf_id']
     return base_df
 
