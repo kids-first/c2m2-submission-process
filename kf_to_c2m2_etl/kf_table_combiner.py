@@ -85,6 +85,8 @@ class KfTableCombiner:
                     table_df = pd.read_csv(file_path, low_memory=False)
 
                     if table_name == "genomic_files":
+                        # Parquet files are visible in DS but not intended to be on the portal,
+                        # so they are omitted from the table here
                         table_df = table_df[(table_df['visible']) & (table_df['file_format'] != "parquet")] 
 
                     elif table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
