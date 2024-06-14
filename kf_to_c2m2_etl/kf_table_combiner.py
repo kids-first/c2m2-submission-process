@@ -108,6 +108,25 @@ class KfTableCombiner:
                                right_key=right) \
                 .get_result()
             base_df_name = table_name
-            
+
+        base_df = apply_study_parent_child_relationship(base_df) 
 
         return base_df
+
+
+def apply_study_parent_child_relationship(the_df: pd.DataFrame):
+    child_to_parent = {
+        'SD_7YDC1W4H': 'SD_Z6MWD3H0',
+        'SD_FYCR78W0': 'SD_Z6MWD3H0',
+        'SD_65064P2Z': 'SD_Z6MWD3H0',
+        'SD_T8VSYRSG': 'SD_Z6MWD3H0',
+        'SD_Y6VRG6MD': 'SD_PREASA7S'
+    }
+
+    kf_study_id_cols = ["SD_kf_id","PT_study_id","studies_on_portal"]
+
+    for study_id_col in kf_study_id_cols:
+        if (any(study_id_col in col for col in the_df.columns)):
+            the_df[study_id_col] = the_df[study_id_col].apply(lambda study_id: child_to_parent.get(study_id, study_id))
+
+    return the_df
