@@ -41,12 +41,12 @@ def transform_kf_to_c2m2_on_disk():
                                          sort_on='biosample_local_id',
                                          ascending_sort=True)
 
-    convert_kf_to_subject_disease(kf_combined_list=['portal_studies','participant','project_disease'],
+    convert_kf_to_subject_disease(kf_combined_list=['portal_studies','participant'],
                                   c2m2_entity_name='subject_disease',
                                   sort_on='subject_local_id',
                                   ascending_sort=True)
 
-    convert_kf_to_biosample_disease(kf_combined_list=['portal_studies','participant','biospecimen','project_disease'],
+    convert_kf_to_biosample_disease(kf_combined_list=['portal_studies','participant','biospecimen'],
                                     c2m2_entity_name='biosample_disease',
                                     sort_on='biosample_local_id',
                                     ascending_sort=True)
@@ -92,6 +92,13 @@ def convert_kf_to_c2m2(func):
 
 @convert_kf_to_c2m2
 def convert_kf_to_project(base_df):
+    # Remove Parent project's children
+    base_df = base_df[(base_df['SD_kf_id'] != 'SD_Z6MWD3H0') | 
+                      ((base_df['SD_kf_id'] == 'SD_Z6MWD3H0') & (base_df['SD_name'].str.contains("Kids First")))]
+
+    base_df = base_df[(base_df['SD_kf_id'] != 'SD_PREASA7S') | 
+                      ((base_df['SD_kf_id'] == 'SD_PREASA7S') & (base_df['SD_name'].str.contains("Kids First")))]
+
     base_df['abbreviation'] = base_df['SD_kf_id']
     return base_df
 
@@ -127,12 +134,28 @@ def convert_kf_to_biosample_from_subject(kf_combined_df):
 def convert_kf_to_subject_disease(kf_combined_df):
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
+
+    project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+    kf_combined_df = TableJoiner(kf_combined_df) \
+                        .left_join(project_disease_df,
+                                   left_key='PT_study_id',
+                                   right_key='study_id') \
+                        .get_result()
+
     return kf_combined_df
 
 @convert_kf_to_c2m2
 def convert_kf_to_biosample_disease(kf_combined_df):
     # Ontology mapping not identified for this study
     kf_combined_df.drop(kf_combined_df.query('PT_study_id == "SD_DZ4GPQX6"').index,inplace=True)
+
+    project_disease_df = pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv'))
+    kf_combined_df = TableJoiner(kf_combined_df) \
+                        .left_join(project_disease_df,
+                                   left_key='PT_study_id',
+                                   right_key='study_id') \
+                        .get_result()
+
     return kf_combined_df
 
 

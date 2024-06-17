@@ -62,7 +62,6 @@ class KfTableCombiner:
     """
     df_dict = {}
     df_dict.setdefault('portal_studies',pd.read_table(os.path.join(file_locations.get_etl_path(),'studies_on_portal.tsv')))
-    df_dict.setdefault('project_disease',pd.read_table(os.path.join(file_locations.get_ontology_mappings_path(),'project_disease_matrix_only.tsv')))
 
     def __init__(self, tables_to_join: list):
         """
@@ -83,10 +82,15 @@ class KfTableCombiner:
                 file_path = os.path.join(file_locations.get_ingested_path(),f'{table_to_endpoint_name[table_name]}.csv')
 
                 if table_name in kf_tablenames:
-                    if table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
-                        table_df = pd.read_csv(file_path, low_memory=False).query('visible == True')
-                    else:
-                        table_df = pd.read_csv(file_path, low_memory=False)
+                    table_df = pd.read_csv(file_path, low_memory=False)
+
+                    if table_name == "genomic_files":
+                        # Parquet files are visible in DS but not intended to be on the portal,
+                        # so they are omitted from the table here
+                        table_df = table_df[(table_df['visible']) & (table_df['file_format'] != "parquet")] 
+
+                    elif table_name in kf_tables_with_visibility and is_column_present(file_path, 'visible'):
+                        table_df = table_df[table_df['visible'] == True]
 
                     KfTableCombiner.df_dict[table_name] = table_df
 
@@ -108,6 +112,25 @@ class KfTableCombiner:
                                right_key=right) \
                 .get_result()
             base_df_name = table_name
-            
+
+        base_df = apply_study_parent_child_relationship(base_df) 
 
         return base_df
+
+
+def apply_study_parent_child_relationship(the_df: pd.DataFrame):
+    child_to_parent = {
+        'SD_7YDC1W4H': 'SD_Z6MWD3H0',
+        'SD_FYCR78W0': 'SD_Z6MWD3H0',
+        'SD_65064P2Z': 'SD_Z6MWD3H0',
+        'SD_T8VSYRSG': 'SD_Z6MWD3H0',
+        'SD_Y6VRG6MD': 'SD_PREASA7S'
+    }
+
+    kf_study_id_cols = ["SD_kf_id","PT_study_id","studies_on_portal"]
+
+    for study_id_col in kf_study_id_cols:
+        if (any(study_id_col in col for col in the_df.columns)):
+            the_df[study_id_col] = the_df[study_id_col].apply(lambda study_id: child_to_parent.get(study_id, study_id))
+
+    return the_df

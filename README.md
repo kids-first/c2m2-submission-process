@@ -61,7 +61,7 @@ OR
       * Also, adds empty tables required for submission
 
 ```bash
-python /kf_to_c2m2_etl/etl.py
+python /kf_to_c2m2_etl/etl.py {FHIR|DS}
 ```
 
 4. Execute osf script for preparing c2m2 submission 
