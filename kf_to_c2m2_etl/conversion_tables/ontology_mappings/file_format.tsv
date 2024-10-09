@@ -30,6 +30,7 @@ format:3914	pre_adapter_summary_metrics
 format:3603	png
 	results
 format:2012	seg
+format:3914	selfSM
 format:3914	summary_metrics
 	svs
 	tar
