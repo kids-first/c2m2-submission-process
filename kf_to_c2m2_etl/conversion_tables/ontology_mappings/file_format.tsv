@@ -7,7 +7,7 @@ format:3327	bai
 format:3914	bait_bias_detail_metrics
 format:3914	bait_bias_summary_metrics
 format:2572	bam
-	cns
+format:2012	cns
 	crai
 format:3462	cram
 	csv
