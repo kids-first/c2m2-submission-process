@@ -35,7 +35,7 @@ format:3914	summary_metrics
 	svs
 format:3914	table
 	tar
-	tbi
+format:3616	tbi
 format:3475	tsv
 	txt
 format:3914	variant_calling_detail_metrics
