@@ -22,7 +22,7 @@ format:2331	html
 format:3578	idat
 format:3914	insert_size_metrics
 format:3008	maf
-	ndjson
+format:3464	ndjson
 format:3508	pdf
 	ped
 format:3914	pre_adapter_detail_metrics
