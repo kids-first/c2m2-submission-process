@@ -33,6 +33,7 @@ format:2012	seg
 format:3914	selfSM
 format:3914	summary_metrics
 	svs
+format:3914	table
 	tar
 	tbi
 format:3475	tsv
