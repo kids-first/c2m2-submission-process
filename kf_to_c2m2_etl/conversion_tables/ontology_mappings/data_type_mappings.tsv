@@ -29,6 +29,8 @@ data:1383	Genome Aligned Read
 data:3210	Genome Aligned Read Index
 data:3498	Genomic Variant
 data:3210	Genomic Variant Index
+data:3498	gVCF
+data:3210	gVCF Index
 data:3914	Het Call QC Metric
 data:2968	Histology Images
 data:3498	Insert Size Metric
@@ -46,7 +48,6 @@ data:3498	Pre-pass Somatic Structural Variation
 data:3210	Pre-pass Somatic Structural Variation Index
 data:3914	QC Metric
 data:3914	Quality Score Distribution
-data:3914	RNAseq Alignment Metrics
 data:2968	Radiology Images
 data:2048	Radiology Reports
 data:3498	Raw Gene Fusion
@@ -58,6 +59,7 @@ data:3210	Raw Somatic Structural Variation Index
 data:3914	Recalibration Report
 data:3498	Reference Copy Number Profiling
 data:3914	Relatedness QC Metrics
+data:3914	RNAseq Alignment Metrics
 data:3498	Simple Nucleotide Variations
 data:3498	Somatic Copy Number BAF
 data:3498	Somatic Copy Number Diagram
@@ -81,5 +83,3 @@ data:3210	Variant Calls Index
 data:3498	Variant Summary
 data:3914	WGS Metric
 data:3914	WXS Metric
-data:3498	gVCF
-data:3210	gVCF Index
