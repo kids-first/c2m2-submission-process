@@ -1,7 +1,9 @@
 id	name
+data:1916	Aligned Read
 data:1916	Aligned Reads
 data:3210	Aligned Reads Index
 data:0867	Alignment Stat
+data:0867	Alignment Stats
 data:0867	Alignment Summary
 data:3498	Annotated Gene Fusion
 data:3498	Annotated Somatic Copy Number Segment
@@ -11,7 +13,9 @@ data:3498	Annotated Somatic Mutations
 data:3498	Annotated Variant Call
 data:3210	Annotated Variant Call Index
 data:3914	Artifact Metric
+data:3914	Artifact Metrics
 data:1916	Chimeric Aligned Read
+data:1916	Chimeric Aligned Reads
 data:3498	Consensus Somatic Mutation
 data:3210	Consensus Somatic Mutation Index
 data:3914	Contamination Estimation
@@ -19,21 +23,28 @@ data:3112	Expression
 data:3914	Familial Relationship
 data:3914	Familial Relationship Report
 data:3914	GC Metric
+data:3914	GC Metrics
 data:3914	Gender Metric
+data:3914	Gender Metrics
 data:3914	Gender QC Metric
+data:3914	Gender QC Metrics
 data:3112	Gene Expression
 data:3112	Gene Expression Count
 data:3112	Gene Expression Quantification
 data:3498	Gene Fusions
 data:1383	Genome Aligned Read
 data:3210	Genome Aligned Read Index
+data:1383	Genome Aligned Reads
+data:3210	Genome Aligned Reads Index
 data:3498	Genomic Variant
 data:3210	Genomic Variant Index
 data:3498	gVCF
 data:3210	gVCF Index
 data:3914	Het Call QC Metric
+data:3914	Het Call QC Metrics
 data:2968	Histology Images
 data:3498	Insert Size Metric
+data:3498	Insert Size Metrics
 data:2603	Isoform Expression
 data:2603	Isoform Expression Quantification
 data:3498	Masked Consensus Somatic Mutation
@@ -58,8 +69,10 @@ data:3498	Raw Somatic Structural Variation
 data:3210	Raw Somatic Structural Variation Index
 data:3914	Recalibration Report
 data:3498	Reference Copy Number Profiling
+data:3914	Relatedness QC Metric
 data:3914	Relatedness QC Metrics
 data:3914	RNAseq Alignment Metrics
+data:3498	Simple Nucleotide Variation
 data:3498	Simple Nucleotide Variations
 data:3498	Somatic Copy Number BAF
 data:3498	Somatic Copy Number Diagram
@@ -70,6 +83,7 @@ data:3498	Somatic Copy Number Segment
 data:3498	Somatic Copy Number Subclone Segment
 data:3498	Somatic Copy Number Variation
 data:3498	Somatic Copy Number Variations
+data:3498	Somatic Structural Variation
 data:3498	Somatic Structural Variations
 data:3498	Splice Junction
 data:3914	Tool Log
@@ -81,4 +95,6 @@ data:3498	Variant Calling Metrics
 data:3498	Variant Calls
 data:3210	Variant Calls Index
 data:3914	WGS Metric
+data:3914	WGS Metrics
 data:3914	WXS Metric
+data:3914	WXS Metrics
