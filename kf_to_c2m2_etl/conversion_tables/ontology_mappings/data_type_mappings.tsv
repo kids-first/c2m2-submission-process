@@ -100,6 +100,7 @@ data:3498	Somatic Structural Variations
 data:3498	Splice Junction
 data:3914	Tool Log
 data:1916	Transcriptome Aligned Read
+data:3498	Tumor Copy Number
 data:3498	Tumor Copy Number Segment
 data:3498	Tumor Only Copy Number BAF
 data:3498	Tumor Only Copy Number Ratio
