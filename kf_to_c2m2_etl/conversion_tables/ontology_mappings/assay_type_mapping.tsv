@@ -2,3 +2,14 @@ id	name	description
 OBI:0002118	WXS	exome sequencing assay
 OBI:0001177	RNA-Seq	RNA sequencing assay
 OBI:0002117	WGS	whole genome sequencing assay
+OBI:0003109	snRNA-Seq	single-nucleus RNA sequencing assay
+	Not Available	
+OBI:0002117	Continuous Long Reads WGS	whole genome sequencing assay
+OBI:0000626	Panel	
+OBI:0002117	ONT WGS	whole genome sequencing assay
+OBI:0002117	Circular Consensus Sequencing WGS	whole genome sequencing assay
+	Other	
+OBI:0001922	miRNA-Seq	microRNA profiling by high throughput sequencing assay
+OBI:0000634	Methylation	
+OBI:0000626	Targeted Sequencing	
+OBI:0002117	Linked-Read WGS (10x Chromium)	whole genome sequencing assay
