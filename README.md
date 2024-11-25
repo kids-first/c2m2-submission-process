@@ -29,7 +29,7 @@ This repository will initially serve as a staging point for the source and data 
  - Installs package dependencies from requirements.txt
 
  ```bash
-source setup_evn.sh
+source setup_env.sh
  ```
 
 2. Acquire submission tools from OSF
