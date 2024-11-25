@@ -82,4 +82,4 @@ python3 ./kf_to_c2m2_etl/etl.py {FHIR|DS}
 
 6. Submit data to CFDE portal
 
-Upload the C2M2 zip file via the CFDE Data Portal at https://data.cfde.cloud/submit/form.
+- Upload the C2M2 zip file via the CFDE Data Portal at https://data.cfde.cloud/submit/form.
