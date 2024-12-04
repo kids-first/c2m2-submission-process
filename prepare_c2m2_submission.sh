@@ -1,6 +1,6 @@
 # Executes prepare submission script
 echo "Executing submission preparation script (prepare_C2M2_submission.py)"
-python prepare_C2M2_submission.py
+python3 prepare_C2M2_submission.py
 
 # Creates frictionless validation directory.
 if [[ ! -e "frictionless_validation" ]]; then
