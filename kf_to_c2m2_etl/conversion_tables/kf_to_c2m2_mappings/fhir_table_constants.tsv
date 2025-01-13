@@ -16,6 +16,7 @@ biosample	project_id_namespace	kidsfirst:
 biosample	persistent_id	
 biosample	sample_prep_method	
 biosample	creation_time	
+biosample	biofluid	
 biosample_from_subject	biosample_id_namespace	kidsfirst:
 biosample_from_subject	subject_id_namespace	kidsfirst:
 biosample_disease	biosample_id_namespace	kidsfirst:

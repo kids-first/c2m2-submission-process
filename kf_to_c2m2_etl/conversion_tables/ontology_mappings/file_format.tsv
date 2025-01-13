@@ -1,28 +1,44 @@
 id	name
 	Not Reported
 	Other
+format:3914	alignment_summary_metrics
+format:3914	alignmentsummary_metrics
 format:3327	bai
+format:3914	bait_bias_detail_metrics
+format:3914	bait_bias_summary_metrics
 format:2572	bam
-	cns
+format:2012	cns
 	crai
 format:3462	cram
 	csv
 	dcm
+format:3914	detail_metrics
+format:3914	error_summary_metrics
 format:1930	fastq
 format:3829	gpr
 	gvcf
+format:3914	hs_metrics
 format:2331	html
 format:3578	idat
+format:3914	insert_size_metrics
 format:3008	maf
-	ndjson
+format:3464	ndjson
 format:3508	pdf
-	ped
+format:3286	ped
+format:3914	pre_adapter_detail_metrics
+format:3914	pre_adapter_summary_metrics
 format:3603	png
 	results
-	seg
+format:2012	seg
+format:3914	selfSM
+format:3914	summary_metrics
 	svs
+format:3914	table
 	tar
-	tbi
+format:3700	tbi
 format:3475	tsv
 	txt
+format:3914	variant_calling_detail_metrics
+format:3914	variant_calling_summary_metrics
 format:3016	vcf
+format:3914	wgs_metrics

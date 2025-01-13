@@ -1,6 +1,6 @@
 # Executes prepare submission script
 echo "Executing submission preparation script (prepare_C2M2_submission.py)"
-python prepare_C2M2_submission.py
+python3 prepare_C2M2_submission.py
 
 # Creates frictionless validation directory.
 if [[ ! -e "frictionless_validation" ]]; then
@@ -20,3 +20,8 @@ cp draft_C2M2_submission_TSVs/*.tsv      frictionless_validation
 # Moves the C2M2 file used to validate the submitted files
 echo "Copying c2m2 schema json to frictionless_validation"
 cp C2M2_datapackage.json                 frictionless_validation
+
+# Zips the C2M2 files into an archive ready for submission
+echo "Zipping the c2m2 files into an archive"
+zip -r "$(date +"%Y%m%d_%H%M%S")_frictionless.zip" frictionless_validation
+

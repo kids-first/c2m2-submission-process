@@ -9,8 +9,6 @@
 
 This repository will initially serve as a staging point for the source and data files associated with the C2M2 submission process. It might eventually grow into a pipeline for the C2M2 process, but we are starting small.
 
-"A journey of a thousand miles begins with a single step" -Laozi
-
 ### Important Links
 
 1. [Base Wiki Page for C2M2 Submissions](https://github.com/nih-cfde/published-documentation/wiki/Quickstart)
@@ -31,7 +29,7 @@ This repository will initially serve as a staging point for the source and data 
  - Installs package dependencies from requirements.txt
 
  ```bash
-source setup_evn.sh
+source setup_env.sh
  ```
 
 2. Acquire submission tools from OSF
@@ -61,7 +59,7 @@ OR
       * Also, adds empty tables required for submission
 
 ```bash
-python /kf_to_c2m2_etl/etl.py {FHIR|DS}
+python3 ./kf_to_c2m2_etl/etl.py {FHIR|DS}
 ```
 
 4. Execute osf script for preparing c2m2 submission 
@@ -84,24 +82,4 @@ python /kf_to_c2m2_etl/etl.py {FHIR|DS}
 
 6. Submit data to CFDE portal
 
-*** Refer to Important Links #7 for additional info***
- - Login with submit tool 
- - Execute submission
-   * Check tables for conformance to C2M2's latest release notes
-   * Set DCC for submission (cfde_registry_dcc:kidsfirst)
- - Verify submission in progress
- - Review submission results
-
- ```bash
-# Will be redirected to web browser for credentials
-cfde-submit login 
-
-# Command starts submission and sets data coordinating center
-cfde-submit run path-to-frictionless-validation --ignore-git --dcc-id cfde_registry_dcc:kidsfirst 
-
-# Can be executed intermittently to verify submission status
-cfde-submit status
-
-# Logout when submission is completed
-cfde-submit logout
-```
+- Upload the C2M2 zip file via the CFDE Data Portal at https://data.cfde.cloud/submit/form.
