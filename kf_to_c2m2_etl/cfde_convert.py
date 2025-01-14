@@ -135,8 +135,8 @@ def fhir_to_cfde_value_converter(target_df: pd.DataFrame, target_column: str):
     return target_df
 
 
-uberon_mapping_df = pd.read_csv(os.path.join(file_locations.get_ontology_mappings_path(),'anatomy_fixed_tabs.tsv'),sep='\t').fillna('')
-uberon_mapping_df['composition_term'] = uberon_mapping_df['composition_term'].apply(str.lower)
+uberon_mapping_df = pd.read_csv(os.path.join(file_locations.get_ontology_mappings_path(),'anatomy_mappings.tsv'),sep='\t').fillna('')
+uberon_mapping_df['source_text_anatomical_site'] = uberon_mapping_df['source_text_anatomical_site'].apply(str.lower)
 uberon_mapping_df['uberon_id'] = uberon_mapping_df['uberon_id'].apply(str.lower)
 uberon_mapping_df = uberon_mapping_df[::-1]
-uberon_mapping_dict = OrderedDict(zip(uberon_mapping_df.composition_term,uberon_mapping_df.uberon_id))
+uberon_mapping_dict = OrderedDict(zip(uberon_mapping_df.source_text_anatomical_site,uberon_mapping_df.uberon_id))
