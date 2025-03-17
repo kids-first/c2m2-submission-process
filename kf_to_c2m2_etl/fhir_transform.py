@@ -162,7 +162,7 @@ def update_hash(row):
     else:
         return row['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_text']
 
-def update_persistent_id(row):
+def update_access_url(row):
     if row['DocumentReference_content_0_attachment_extension_1_valueCodeableConcept_coding_0_display'] == 'etag':
         return np.nan
     else:

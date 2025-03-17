@@ -9,7 +9,7 @@ from file_locations import file_locations
 from kf_table_combiner import KfTableCombiner
 from etl_types import ETLType
 
-from value_converter import modify_dbgap, get_persistent_id, \
+from value_converter import modify_dbgap, get_access_url, \
                             path_to_filename, convert_days_to_years, \
                             apply_uberon_mapping
 
@@ -211,8 +211,8 @@ def convert_kf_to_file(kf_genomic_files):
     file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'SE_experiment_strategy')
     
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
-    file_df['persistent_id'] = file_df.apply(lambda the_df: 
-                                             get_persistent_id(the_df['PT_study_id'],
+    file_df['access_url'] = file_df.apply(lambda the_df: 
+                                             get_access_url(the_df['PT_study_id'],
                                                                the_df['GF_latest_did'],
                                                                the_df['md5']),
                                              axis=1)
