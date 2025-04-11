@@ -14,7 +14,7 @@ def modify_dbgap(study_id):
         else:
             return ''
 
-def get_persistent_id(study, did, md5):
+def get_access_url(study, did, md5):
     if isinstance(study,str) and isinstance(did,str) and pd.notnull(md5):
         if study not in ['SD_BHJXBDQK','SD_8Y99QZJJ','SD_46RR9ZR6','SD_YNSSAPHE']:
             return 'drs://data.kidsfirstdrc.org/' + did
