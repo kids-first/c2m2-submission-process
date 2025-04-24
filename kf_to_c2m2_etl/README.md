@@ -14,6 +14,6 @@ The mapping that serves as the guideline/requirement for the transform portion o
 
 4. Value Conversion: The pipeline reads the target column data from the input DataFrame and merges it with the conversion table. The merge is performed based on the "name" column in the conversion table and the target column in the input DataFrame. The resulting merged DataFrame contains the converted values in the C2M2 column, which are then stored in the input DataFrame using the KF column name retrieved from the column mapping.
 
-5. Anatomy/More nuanced Mapping: The pipeline performs additional mapping for the "composition_term" column to lowercase using an OrderedDict object that maps the composition terms to their corresponding anatomical entities in lowercase format.
+5. Anatomy/More nuanced Mapping: The pipeline performs additional mapping for the "source_text_anatomical_site" column to lowercase using an OrderedDict object that maps the source text anatomical terms to their corresponding UBERON terms in lowercase format.
 
 The ETL flow described above is performed for each target column in the input DataFrame, allowing for the conversion of multiple columns from the KF data model to the NIH's C2M2 Crosscut Metadata Model in a single run of the pipeline. This pipeline is intended to facilitate data integration and analysis for human subjects research related to cancer and birth defects, and can be used to convert data from diverse sources into a standardized format for further analysis and insights.
