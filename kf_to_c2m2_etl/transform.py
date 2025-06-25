@@ -174,41 +174,57 @@ def convert_kf_to_file(kf_genomic_files):
     seq_exp_gen_files_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'sequencing-experiment-genomic-files.csv'),
                                        low_memory=False) \
                                         .query('visible == True')
+    print("Loaded sequencing experiment to genomic file mappings.")
 
     seq_exp_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'sequencing-experiments.csv'),
                                        low_memory=False) \
                                         .query('visible == True')
+    print("Loaded sequencing experiment details.")
 
     indexd_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'indexd_scrape.csv'),low_memory=False)
     hashes_df = pd.read_csv(os.path.join(file_locations.get_ingested_path(),'hashes.csv'),low_memory=False)
-    
+    print("Loaded file index and hash records.")
+  
     metadata_df = TableJoiner(indexd_df) \
             .join_kf_table(hashes_df,
                            left_key='url',
                            right_key='s3path') \
-            .get_result()                   
+            .get_result()      
+    del indexd_df, hashes_df
+    print("Successfully joined file metadata with hashes.")
 
     kf_genomic_files = TableJoiner(kf_genomic_files) \
                     .left_join(metadata_df,
                                left_key='GF_latest_did',
                                right_key='did') \
                     .get_result()
+    del metadata_df
+    print("Enriched genomic files with core metadata.")
 
     experiment_strategy = TableJoiner(seq_exp_gen_files_df) \
                     .join_kf_table(seq_exp_df,
                                left_key='SG_sequencing_experiment_id',
                                right_key='SE_kf_id',) \
                     .get_result()
+    del seq_exp_gen_files_df, seq_exp_df
+    print("Successfully combined experiment data to determine file strategies.")
 
-    kf_genomic_files = TableJoiner(kf_genomic_files) \
-                    .left_join(experiment_strategy,
-                               left_key='GF_kf_id',
-                               right_key='SG_genomic_file_id') \
-                    .get_result()
+    try:
+      kf_genomic_files = TableJoiner(kf_genomic_files) \
+                      .left_join(experiment_strategy,
+                                 left_key='GF_kf_id',
+                                 right_key='SG_genomic_file_id') \
+                      .get_result()
+      del experiment_strategy
+    except Exception as error:
+      print("An error occurred:", type(error).__name__, "-", error)
+      raise error
+    print("Enriched genomic files with experiment strategy information.")
 
     file_df = kf_to_cfde_value_converter(ETLType.DS, kf_genomic_files,'GF_file_format')
     file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'GF_data_type')
     file_df = kf_to_cfde_value_converter(ETLType.DS, file_df,'SE_experiment_strategy')
+    print("Value conversions to C2M2 standard are complete.")
     
     file_df['BS_dbgap_consent_code'] = file_df['BS_dbgap_consent_code'].apply(modify_dbgap)
     file_df['access_url'] = file_df.apply(lambda the_df: 
@@ -231,12 +247,14 @@ def convert_kf_to_file_describes_biosample(kf_genomic_files: pd.DataFrame):
                            left_key='url',
                            right_key='s3path') \
             .get_result()                   
+    del indexd_df, hashes_df
 
     kf_genomic_files = TableJoiner(kf_genomic_files) \
                     .left_join(metadata_df,
                                left_key='GF_latest_did',
                                right_key='did') \
                     .get_result()
+    del metadata_df
 
     return kf_genomic_files
 
