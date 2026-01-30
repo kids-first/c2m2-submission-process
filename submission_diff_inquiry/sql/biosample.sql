@@ -1,3 +1,0 @@
--- SQLite
-select *
-from biosample;
