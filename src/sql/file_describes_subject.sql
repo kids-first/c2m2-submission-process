@@ -1,0 +1,2 @@
+select *
+from nemarichc_dev_schema_reporting.c2m2_file_describes_subject;
