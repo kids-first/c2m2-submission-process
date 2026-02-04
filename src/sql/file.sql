@@ -6,10 +6,18 @@ select
   persistent_id,
   creation_time,
   size_in_bytes,
+  -- uncompressed_size_in_bytes,
   sha256,
+  -- md5, -- deprecated but allows
+  -- filename,
   file_format,
-  dbgap_study_id,
+  -- compression_format,
   data_type,
   assay_type,
+  -- analysis_type,
+  -- mime_type,
+  -- bundle_collection_id_namespace,
+  -- bundle_collection_local_id,
+  dbgap_study_id,
   access_url
-from nemarichc_dev_schema_reporting.c2m2_file;
+from c2m2_file;

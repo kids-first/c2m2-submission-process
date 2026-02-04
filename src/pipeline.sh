@@ -1,5 +1,3 @@
-
-
 # fill in your tables however you like
 python3.12 ./src/sql_to_tsv_stream.py
 python3.12 ./src/loader.py

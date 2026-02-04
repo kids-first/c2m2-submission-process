@@ -6,4 +6,4 @@ select
   abbreviation,
   name,
   description
-from nemarichc_dev_schema_reporting.c2m2_project;
+from c2m2_project;

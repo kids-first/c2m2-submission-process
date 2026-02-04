@@ -3,7 +3,10 @@ select
   local_id,
   project_id_namespace,
   project_local_id,
+  -- persistent_id,
   creation_time,
+  granularity,
   sex,
-  ethnicity
-from nemarichc_dev_schema_reporting.c2m2_subject;
+  ethnicity-- ,
+  -- age_at_enrollment
+from c2m2_subject;

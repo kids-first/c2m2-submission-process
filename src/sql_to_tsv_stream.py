@@ -110,6 +110,8 @@ def main():
         logging.info("No .sql files found in %s", source_dir)
         return
 
+    schema = os.environ.get("DB_SCHEMA")
+
     conn_info = dict(
         dbname=os.environ.get("DB_NAME"),
         user=os.environ.get("DB_USERNAME"),
@@ -117,6 +119,7 @@ def main():
         host=os.environ.get("DB_HOST"),
         port=os.environ.get("DB_PORT"),
         sslmode="require",
+        options=f"-c search_path={schema}"
     )
 
     try:
