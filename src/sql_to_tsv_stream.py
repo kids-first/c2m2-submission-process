@@ -23,18 +23,23 @@ from psycopg2.extras import DictCursor
 
 dotenv.load_dotenv()
 
+
 def setup_logging(log_file: Path):
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler(log_file, mode="a")
-        ]
+            logging.FileHandler(log_file, mode="a"),
+        ],
     )
 
+
 def get_sql_files(source_dir: Path):
-    return sorted([p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() == ".sql"])
+    return sorted(
+        [p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() == ".sql"]
+    )
+
 
 def write_rows_tsv_stream(cur, out_path: Path, fetch_size: int):
     """
@@ -45,7 +50,11 @@ def write_rows_tsv_stream(cur, out_path: Path, fetch_size: int):
     with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
         # Column names
-        columns = [desc.name for desc in cur.description] if cur.description is not None else []
+        columns = (
+            [desc.name for desc in cur.description]
+            if cur.description is not None
+            else []
+        )
         if columns:
             writer.writerow(columns)
         else:
@@ -60,6 +69,7 @@ def write_rows_tsv_stream(cur, out_path: Path, fetch_size: int):
             for row in rows:
                 # If row is a psycopg2.extras.DictRow, indexing by column name works.
                 writer.writerow([row.get(col) for col in columns])
+
 
 def run_sql_file_stream(conn, sql_text: str, out_path: Path, fetch_size: int):
     """
@@ -81,15 +91,18 @@ def run_sql_file_stream(conn, sql_text: str, out_path: Path, fetch_size: int):
             return
         write_rows_tsv_stream(cur, out_path, fetch_size)
 
+
 def main():
-    source_dir = Path(os.environ.get('SOURCE_DIR'))
-    dest_dir = Path(os.environ.get('DEST_DIR'))
-    log_file = Path(os.environ.get('LOG_FILE'))
+    source_dir = Path(os.environ.get("SOURCE_DIR"))
+    dest_dir = Path(os.environ.get("DEST_DIR"))
+    log_file = Path(os.environ.get("LOG_FILE"))
 
     setup_logging(log_file)
 
     if not source_dir.exists() or not source_dir.is_dir():
-        logging.error("Source directory does not exist or is not a directory: %s", source_dir)
+        logging.error(
+            "Source directory does not exist or is not a directory: %s", source_dir
+        )
         sys.exit(2)
 
     sql_files = get_sql_files(source_dir)
@@ -98,12 +111,12 @@ def main():
         return
 
     conn_info = dict(
-        dbname=os.environ.get('DB_NAME'),
-        user=os.environ.get('DB_USERNAME'),
-        password=os.environ.get('DB_PASSWORD'),
-        host=os.environ.get('DB_HOST'),
-        port=os.environ.get('DB_PORT'),
-        sslmode="require"
+        dbname=os.environ.get("DB_NAME"),
+        user=os.environ.get("DB_USERNAME"),
+        password=os.environ.get("DB_PASSWORD"),
+        host=os.environ.get("DB_HOST"),
+        port=os.environ.get("DB_PORT"),
+        sslmode="require",
     )
 
     try:
@@ -138,7 +151,9 @@ def main():
 
         try:
             # Each file executes in its own transaction so the server-side cursor is closed when we commit/rollback
-            run_sql_file_stream(conn, sql_text, out_path, int(os.environ.get('FETCH_SIZE')))
+            run_sql_file_stream(
+                conn, sql_text, out_path, int(os.environ.get("FETCH_SIZE"))
+            )
             if True:
                 conn.commit()
             else:
@@ -154,7 +169,10 @@ def main():
             errors += 1
 
     conn.close()
-    logging.info("Completed. %d file(s) processed, %d error(s).", len(sql_files), errors)
+    logging.info(
+        "Completed. %d file(s) processed, %d error(s).", len(sql_files), errors
+    )
+
 
 if __name__ == "__main__":
     main()
