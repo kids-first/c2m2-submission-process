@@ -11,7 +11,7 @@ cfde-c2m2 init
 cfde-c2m2 prepare
 
 # verify integrity of your package and export results to `logs` folder
-cfde-c2m2 validate > "./logs/$(date +"%Y%m%d_%H%M%S")_c2m2_validation.log" 2>&1
+cfde-c2m2 validate > "../logs/$(date +"%Y%m%d_%H%M%S")_c2m2_validation.log" 2>&1
 
 # zip the necessary files for a bare minimum package
 cfde-c2m2 package
