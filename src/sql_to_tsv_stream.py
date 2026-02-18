@@ -1,13 +1,11 @@
 """
-run_sql_to_tsv_stream.py
+sql_to_tsv_stream.py
 
 - Uses psycopg2 and a server-side named cursor to stream large results.
 - Writes TSV incrementally with a configurable fetch size.
-- Usage example:
-    python run_sql_to_tsv_stream.py --dbname mydb --user me --source ./sql --dest ./tsv_out --fetch-size 1000
 
 Requirements:
-    pip install psycopg2-binary
+    pip install psycopg2
 """
 
 import csv
@@ -37,9 +35,12 @@ def setup_logging(log_file: Path):
 
 def get_sql_files(source_dir: Path):
     return sorted(
-        [p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() == ".sql"]
+        [
+            p
+            for p in source_dir.iterdir()
+            if p.is_file() and p.suffix.lower() == ".sql"
+        ]
     )
-
 
 def write_rows_tsv_stream(cur, out_path: Path, fetch_size: int):
     """
@@ -69,7 +70,6 @@ def write_rows_tsv_stream(cur, out_path: Path, fetch_size: int):
             for row in rows:
                 # If row is a psycopg2.extras.DictRow, indexing by column name works.
                 writer.writerow([row.get(col) for col in columns])
-
 
 def run_sql_file_stream(conn, sql_text: str, out_path: Path, fetch_size: int):
     """
@@ -101,7 +101,8 @@ def main():
 
     if not source_dir.exists() or not source_dir.is_dir():
         logging.error(
-            "Source directory does not exist or is not a directory: %s", source_dir
+            "Source directory does not exist or is not a directory: %s",
+            source_dir,
         )
         sys.exit(2)
 
@@ -119,7 +120,7 @@ def main():
         host=os.environ.get("DB_HOST"),
         port=os.environ.get("DB_PORT"),
         sslmode="require",
-        options=f"-c search_path={schema}"
+        options=f"-c search_path={schema}",
     )
 
     try:
@@ -134,7 +135,9 @@ def main():
     # Try to set read-only transaction by default
     try:
         with conn.cursor() as startup_cur:
-            startup_cur.execute("SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY;")
+            startup_cur.execute(
+                "SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY;"
+            )
     except Exception:
         # not fatal
         pass
@@ -175,7 +178,6 @@ def main():
     logging.info(
         "Completed. %d file(s) processed, %d error(s).", len(sql_files), errors
     )
-
 
 if __name__ == "__main__":
     main()
