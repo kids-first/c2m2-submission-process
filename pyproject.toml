@@ -2,7 +2,7 @@
 name = "kf-c2m2-submission-process"
 version = "2.0.0"
 dependencies = [
-    "cfde-c2m2==0.3.3",
+    "cfde-c2m2==0.4.0",
     "dotenv==0.9.9",
     "pandas==3.0.0",
     "psycopg2_binary==2.9.11"
@@ -22,7 +22,7 @@ dev = [
     "sqlfluff"
 ]
 
-[tool.sqlfluff]
+[tool.sqlfluff.core]
 dialect = "postgres"
 verbose = 1
 

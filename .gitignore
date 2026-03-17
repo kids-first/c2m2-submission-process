@@ -1,37 +1,39 @@
 # C2M2 Manifests and generation files
-submission/
 *.zip
+submission/
+test/
 
 # Logging
-logs/
 *.log
+logs/
 
 # Distribution / packaging
+__pycache__/
+.eggs/
+.installed.cfg
 .Python
+.python-version
+*.egg-info/
+*.eggs
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
 lib/
 lib64/
+MANIFEST
 parts/
+pip-wheel-metadata/
 sdist/
+share/python-wheels/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.eggs
-MANIFEST
-.python-version
 
 # Environments
 .env
-.venv
 .env/
+.venv
 .venv/
 env/
 venv/
