@@ -1,9 +1,9 @@
 select
-  id_namespace,
-  local_id,
-  persistent_id,
-  creation_time,
-  abbreviation,
-  name,
-  description
-from c2m2_project;
+  p.id_namespace,
+  p.local_id,
+  p.persistent_id,
+  p.creation_time,
+  p.abbreviation,
+  p.name,
+  p.description
+from c2m2_project as p;
