@@ -1,11 +1,11 @@
 # C2M2 Manifests and generation files
+*.json
+*.sqlite
+*.tsv
 *.zip
-submission/
-test/
 
 # Logging
 *.log
-logs/
 
 # Distribution / packaging
 __pycache__/
