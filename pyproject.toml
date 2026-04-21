@@ -1,0 +1,36 @@
+[project]
+name = "kf-c2m2-submission-process"
+version = "2.0.0"
+dependencies = [
+    "cfde-c2m2==0.4.0",
+    "dotenv==0.9.9",
+    "pandas==3.0.0",
+    "psycopg2_binary==2.9.11"
+]
+requires-python = ">=3.12,<3.13"
+authors = [
+    {name = "Chris Nemarich", email = "nemarichc@chop.edu"}
+]
+description = "A pipeline for assembling the Kids First CFDE C2M2 manifest"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "sqlfluff"
+]
+
+[tool.sqlfluff.core]
+dialect = "postgres"
+verbose = 1
+
+[tool.sqlfluff.indentation]
+tab_space_size = 2
+
+[tool.sqlfluff.rules.capitalisation.keywords]
+capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.capitalisation.identifiers]
+capitalisation_policy = "lower"
