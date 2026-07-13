@@ -1,0 +1,6 @@
+select
+  biosample_id_namespace,
+  biosample_local_id,
+  collection_id_namespace,
+  collection_local_id
+from c2m2_biosample_in_collection;

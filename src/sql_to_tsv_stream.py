@@ -14,24 +14,10 @@ import os
 import sys
 import uuid
 from pathlib import Path
+from utils import load_env, setup_logging
 
-import dotenv
 import psycopg2
 from psycopg2.extras import DictCursor
-
-dotenv.load_dotenv()
-
-
-def setup_logging(log_file: Path):
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-            logging.FileHandler(log_file, mode="a"),
-        ],
-    )
-
 
 def get_sql_files(source_dir: Path):
     return sorted(
@@ -93,6 +79,8 @@ def run_sql_file_stream(conn, sql_text: str, out_path: Path, fetch_size: int):
 
 
 def main():
+    load_env()
+    
     source_dir = Path(os.environ.get("SOURCE_DIR"))
     dest_dir = Path(os.environ.get("DEST_DIR"))
     log_file = Path(os.environ.get("LOG_FILE"))
